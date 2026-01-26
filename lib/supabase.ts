@@ -278,15 +278,10 @@ export async function searchCustomers(query: string): Promise<Customer[]> {
 }
 
 export async function searchMaterials(query: string): Promise<Material[]> {
+  // First try searching in makt (material descriptions)
   const { data, error } = await supabase
     .from('makt')
-    .select(`
-      matnr,
-      maktx,
-      mara!inner(mtart, matkl, meins),
-      marc!inner(stdprice),
-      mard!inner(labst)
-    `)
+    .select('matnr, maktx')
     .ilike('maktx', `%${query}%`)
     .order('maktx');
 
@@ -295,15 +290,50 @@ export async function searchMaterials(query: string): Promise<Material[]> {
     return [];
   }
 
-  return (data || []).map((m: any) => ({
-    matnr: m.matnr,
-    maktx: m.maktx,
-    mtart: m.mara?.mtart,
-    matkl: m.mara?.matkl,
-    meins: m.mara?.meins,
-    stdprice: m.marc?.[0]?.stdprice || m.marc?.stdprice,
-    labst: m.mard?.[0]?.labst || m.mard?.labst,
-  }));
+  if (!data || data.length === 0) {
+    return [];
+  }
+
+  // Get full material data for matching materials
+  const matnrs = data.map(d => d.matnr);
+  const results: Material[] = [];
+
+  for (const item of data) {
+    // Get mara data
+    const { data: maraData } = await supabase
+      .from('mara')
+      .select('mtart, matkl, meins')
+      .eq('matnr', item.matnr)
+      .single();
+
+    // Get marc data (price)
+    const { data: marcData } = await supabase
+      .from('marc')
+      .select('stdprice')
+      .eq('matnr', item.matnr)
+      .limit(1)
+      .single();
+
+    // Get mard data (stock)
+    const { data: mardData } = await supabase
+      .from('mard')
+      .select('labst')
+      .eq('matnr', item.matnr)
+      .limit(1)
+      .single();
+
+    results.push({
+      matnr: item.matnr,
+      maktx: item.maktx,
+      mtart: maraData?.mtart,
+      matkl: maraData?.matkl,
+      meins: maraData?.meins,
+      stdprice: marcData?.stdprice,
+      labst: mardData?.labst,
+    });
+  }
+
+  return results;
 }
 
 export async function checkMaterialAvailability(matnr: string, quantity: number): Promise<{ available: boolean; stock: number }> {

@@ -33,24 +33,47 @@ const intentPatterns: Array<{
   intent: string;
   extractors: Record<string, (match: string) => any>;
 }> = [
-  // Purchase Order Creation
+  // Purchase Order Creation - "create PO for 50 steel beams from Acme"
   {
     patterns: [
-      /create\s+(?:a\s+)?(?:standard\s+)?(?:purchase\s+order|po)\s+(?:for\s+)?(?:vendor\s+)?(.+?)\s+(?:for\s+)?(\d+)\s+(?:units?\s+(?:of\s+)?)?(.+?)(?:\s*,?\s*delivery\s+(.+))?$/i,
-      /(?:new|make)\s+(?:purchase\s+order|po)\s+(.+?)\s+(\d+)\s+(.+)/i,
+      /create\s+(?:a\s+)?(?:purchase\s+order|po)\s+(?:for\s+)?(\d+)\s+(?:units?\s+(?:of\s+)?)?(.+?)\s+from\s+(.+)/i,
+    ],
+    intent: 'CREATE_PURCHASE_ORDER',
+    extractors: {
+      quantity: (m) => parseInt(m),
+      material: (m) => m,
+      vendor: (m) => m,
+    },
+  },
+  // Purchase Order Creation - "create PO from Acme for 50 steel beams"
+  {
+    patterns: [
+      /create\s+(?:a\s+)?(?:purchase\s+order|po)\s+from\s+(.+?)\s+for\s+(\d+)\s+(?:units?\s+(?:of\s+)?)?(.+)/i,
+      /(?:new|make)\s+(?:purchase\s+order|po)\s+(?:from\s+|vendor\s+)(.+?)\s+(\d+)\s+(.+)/i,
     ],
     intent: 'CREATE_PURCHASE_ORDER',
     extractors: {
       vendor: (m) => m,
       quantity: (m) => parseInt(m),
       material: (m) => m,
-      deliveryDate: (m) => m,
     },
   },
-  // Sales Order Creation
+  // Sales Order Creation - "create SO for 50 laptops for TechCorp"
   {
     patterns: [
-      /create\s+(?:a\s+)?(?:sales\s+order|so)\s+(?:for\s+)?(?:customer\s+)?(.+?)\s+(?:for\s+)?(\d+)\s+(?:units?\s+(?:of\s+)?)?(.+)/i,
+      /create\s+(?:a\s+)?(?:sales\s+order|so)\s+(?:for\s+)?(\d+)\s+(?:units?\s+(?:of\s+)?)?(.+?)\s+(?:for|to)\s+(.+)/i,
+    ],
+    intent: 'CREATE_SALES_ORDER',
+    extractors: {
+      quantity: (m) => parseInt(m),
+      material: (m) => m,
+      customer: (m) => m,
+    },
+  },
+  // Sales Order Creation - "create SO for customer TechCorp for 50 laptops"
+  {
+    patterns: [
+      /create\s+(?:a\s+)?(?:sales\s+order|so)\s+(?:for\s+)?(?:customer\s+)?(.+?)\s+for\s+(\d+)\s+(?:units?\s+(?:of\s+)?)?(.+)/i,
       /(?:new|make)\s+(?:sales\s+order|so)\s+(.+?)\s+(\d+)\s+(.+)/i,
     ],
     intent: 'CREATE_SALES_ORDER',
