@@ -64,10 +64,11 @@ interface ProcessingDetails {
 }
 
 // Sample queries organized by category - covers full proposal scope
+// Using actual data from database for reliable demos
 const sampleQueries = [
   // Transactional Automation
-  { query: "Create PO for 50 Industrial Pump Motors from Acme Industrial", icon: ShoppingCart, category: "Create" },
-  { query: "Create SO for 100 steel beams for TechCorp Industries", icon: FileText, category: "Create" },
+  { query: "Create PO for 50 Pump Motors from Acme Industrial", icon: ShoppingCart, category: "Create" },
+  { query: "Create SO for 25 Hydraulic Cylinders for TechFlow Industries", icon: FileText, category: "Create" },
   // Visibility & Reporting
   { query: "Show today's daily report", icon: FileText, category: "Report" },
   { query: "Track shipment FDX-789456123", icon: Truck, category: "Track" },
@@ -75,7 +76,7 @@ const sampleQueries = [
   // Status Queries
   { query: "Show me all vendors", icon: Building2, category: "Query" },
   { query: "Show purchase orders", icon: FileText, category: "Query" },
-  { query: "What's the status of invoice INV-2024-001?", icon: FileText, category: "Check" },
+  { query: "Check status of invoice INV-2024-001", icon: FileText, category: "Check" },
 ];
 
 export default function Home() {

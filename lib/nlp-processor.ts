@@ -109,13 +109,14 @@ const intentPatterns: Array<{
   // Invoice Payment Status
   {
     patterns: [
-      /(?:what is|check)\s+(?:the\s+)?(?:payment\s+)?status\s+(?:of|for)\s+invoice\s*(.+)/i,
+      /(?:what(?:'s| is)|check)\s+(?:the\s+)?(?:payment\s+)?status\s+(?:of|for)\s+invoice\s*(.+)/i,
       /(?:when will|has)\s+invoice\s*(.+?)\s+(?:be paid|been paid)/i,
       /invoice\s*(.+?)\s+(?:payment\s+)?status/i,
+      /status\s+(?:of|for)\s+invoice\s*(.+)/i,
     ],
     intent: 'CHECK_INVOICE_STATUS',
     extractors: {
-      invoiceRef: (m) => m.trim(),
+      invoiceRef: (m) => m.trim().replace(/\?$/, ''),
     },
   },
   // PO Status
@@ -126,7 +127,7 @@ const intentPatterns: Array<{
     ],
     intent: 'GET_PO_STATUS',
     extractors: {
-      poNumber: (m) => m.trim().replace(/^#/, ''),
+      poNumber: (m) => m.trim().replace(/^#/, '').replace(/\?$/, ''),
     },
   },
   // SO Status
@@ -137,7 +138,7 @@ const intentPatterns: Array<{
     ],
     intent: 'GET_SO_STATUS',
     extractors: {
-      soNumber: (m) => m.trim().replace(/^#/, ''),
+      soNumber: (m) => m.trim().replace(/^#/, '').replace(/\?$/, ''),
     },
   },
   // List Purchase Orders

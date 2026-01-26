@@ -256,36 +256,93 @@ export async function getInvoices(): Promise<Invoice[]> {
 }
 
 export async function searchVendors(query: string): Promise<Vendor[]> {
-  const { data, error } = await supabase
-    .from('lfa1')
-    .select('*')
-    .ilike('name1', `%${query}%`)
-    .order('name1');
+  // Normalize query - try variations
+  let searchQuery = query.trim();
 
-  if (error) throw error;
-  return data || [];
+  const searchVariations = [
+    searchQuery,
+    searchQuery.split(' ').slice(0, 2).join(' '), // First two words
+    searchQuery.split(' ')[0], // First word only
+  ];
+
+  for (const variation of searchVariations) {
+    if (!variation || variation.length < 2) continue;
+
+    const { data, error } = await supabase
+      .from('lfa1')
+      .select('*')
+      .ilike('name1', `%${variation}%`)
+      .order('name1');
+
+    if (data && data.length > 0) {
+      return data;
+    }
+  }
+
+  return [];
 }
 
 export async function searchCustomers(query: string): Promise<Customer[]> {
-  const { data, error } = await supabase
-    .from('kna1')
-    .select('*')
-    .ilike('name1', `%${query}%`)
-    .order('name1');
+  // Normalize query - try variations
+  let searchQuery = query.trim();
 
-  if (error) throw error;
-  return data || [];
+  const searchVariations = [
+    searchQuery,
+    searchQuery.split(' ').slice(0, 2).join(' '), // First two words
+    searchQuery.split(' ')[0], // First word only
+  ];
+
+  for (const variation of searchVariations) {
+    if (!variation || variation.length < 2) continue;
+
+    const { data, error } = await supabase
+      .from('kna1')
+      .select('*')
+      .ilike('name1', `%${variation}%`)
+      .order('name1');
+
+    if (data && data.length > 0) {
+      return data;
+    }
+  }
+
+  return [];
 }
 
 export async function searchMaterials(query: string): Promise<Material[]> {
-  // First try searching in makt (material descriptions)
-  const { data, error } = await supabase
-    .from('makt')
-    .select('matnr, maktx')
-    .ilike('maktx', `%${query}%`)
-    .order('maktx');
+  // Normalize query - remove plurals, clean up
+  let searchQuery = query.trim();
 
-  if (error) {
+  // Try exact match first, then variations
+  const searchVariations = [
+    searchQuery,
+    searchQuery.replace(/s$/i, ''), // Remove trailing 's' (plural)
+    searchQuery.replace(/es$/i, ''), // Remove trailing 'es'
+    searchQuery.split(' ').slice(0, 2).join(' '), // First two words
+    searchQuery.split(' ')[0], // First word only
+  ];
+
+  let data: any[] = [];
+  let error: any = null;
+
+  // Try each variation until we find results
+  for (const variation of searchVariations) {
+    if (!variation || variation.length < 2) continue;
+
+    const result = await supabase
+      .from('makt')
+      .select('matnr, maktx')
+      .ilike('maktx', `%${variation}%`)
+      .order('maktx');
+
+    if (result.data && result.data.length > 0) {
+      data = result.data;
+      break;
+    }
+    error = result.error;
+  }
+
+  if (error && data.length === 0) {
     console.error('Error searching materials:', error);
     return [];
   }
