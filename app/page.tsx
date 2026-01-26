@@ -37,6 +37,7 @@ import {
   ExternalLink,
   Copy,
   Check,
+  Lock,
 } from 'lucide-react';
 
 interface Message {
@@ -846,303 +847,490 @@ function StepDataDisplay({ stepId, data }: { stepId: number, data: any }) {
 
 // Architecture Diagram Component
 function ArchitectureDiagram() {
-  const [selectedApproach, setSelectedApproach] = useState<'recommended' | 'alternative1' | 'alternative2'>('recommended');
-
-  const approaches = {
-    recommended: {
-      title: 'Azure-Native Integration (Recommended)',
-      description: 'Leverages Azure Integration Services for a fully managed, scalable solution',
-      pros: ['Fully managed services', 'Native Azure security', 'Auto-scaling', 'Low latency'],
-      cons: ['Azure lock-in', 'Cost at scale'],
-    },
-    alternative1: {
-      title: 'SAP BTP Integration Suite',
-      description: 'Uses SAP Business Technology Platform for integration',
-      pros: ['SAP-native', 'Pre-built connectors', 'SAP support'],
-      cons: ['Additional licensing', 'Complexity'],
-    },
-    alternative2: {
-      title: 'Custom Middleware',
-      description: 'Self-hosted integration layer with RFC SDK',
-      pros: ['Full control', 'No vendor lock-in', 'One-time cost'],
-      cons: ['Maintenance burden', 'Security responsibility'],
-    },
-  };
+  const [activeSection, setActiveSection] = useState<'architecture' | 'dataflow' | 'costs' | 'discovery'>('architecture');
 
   return (
     <div className="max-w-6xl mx-auto">
-      <div className="mb-8">
-        <h2 className="text-xl font-bold text-white flex items-center gap-2">
-          <GitBranch className="w-6 h-6 text-blue-400" />
-          Solution Architecture
-        </h2>
-        <p className="text-sm text-white/50 mt-1">Agentic SAP integration architecture with Microsoft Azure</p>
+      {/* Header */}
+      <div className="mb-6">
+        <div className="flex items-center gap-3 mb-2">
+          <div className="p-2 bg-blue-500/20 rounded-lg">
+            <GitBranch className="w-6 h-6 text-blue-400" />
+          </div>
+          <div>
+            <h2 className="text-xl font-bold text-white">Microsoft Copilot + SAP Integration Architecture</h2>
+            <p className="text-sm text-white/50">Enterprise-grade solution leveraging Microsoft 365 ecosystem</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2 mt-3">
+          <span className="px-2 py-1 bg-blue-500/20 text-blue-400 rounded text-xs font-medium">Microsoft Partner Certified</span>
+          <span className="px-2 py-1 bg-green-500/20 text-green-400 rounded text-xs font-medium">Production Ready</span>
+          <span className="px-2 py-1 bg-purple-500/20 text-purple-400 rounded text-xs font-medium">Penguin Solutions</span>
+        </div>
       </div>
 
-      {/* Approach Selector */}
-      <div className="flex gap-2 mb-8">
-        {Object.entries(approaches).map(([key, approach]) => (
+      {/* Section Tabs */}
+      <div className="flex gap-1 mb-6 bg-white/5 rounded-lg p-1">
+        {[
+          { id: 'architecture', label: 'Architecture', icon: Network },
+          { id: 'dataflow', label: 'Data Flow & Components', icon: Workflow },
+          { id: 'costs', label: 'Cost Analysis', icon: FileText },
+          { id: 'discovery', label: 'Discovery Questions', icon: MessageSquare },
+        ].map(({ id, label, icon: Icon }) => (
           <button
-            key={key}
-            onClick={() => setSelectedApproach(key as any)}
-            className={`flex-1 p-3 rounded-lg border text-left transition-all ${
-              selectedApproach === key
-                ? 'bg-blue-500/10 border-blue-500/50 ring-2 ring-blue-500/30'
-                : 'bg-white/5 border-white/10 hover:bg-white/10'
+            key={id}
+            onClick={() => setActiveSection(id as any)}
+            className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all ${
+              activeSection === id
+                ? 'bg-blue-500 text-white'
+                : 'text-white/60 hover:text-white hover:bg-white/10'
             }`}
           >
-            <div className="flex items-center gap-2 mb-1">
-              {key === 'recommended' && <CheckCircle2 className="w-4 h-4 text-green-400" />}
-              <span className={`text-sm font-medium ${selectedApproach === key ? 'text-white' : 'text-white/70'}`}>
-                {approach.title}
-              </span>
-            </div>
-            <p className="text-xs text-white/40">{approach.description}</p>
+            <Icon className="w-4 h-4" />
+            {label}
           </button>
         ))}
       </div>
 
-      {/* Architecture Diagram */}
-      <div className="bg-[#12121f] border border-white/10 rounded-xl p-8 mb-8">
-        {selectedApproach === 'recommended' && <RecommendedArchitecture />}
-        {selectedApproach === 'alternative1' && <BTPArchitecture />}
-        {selectedApproach === 'alternative2' && <CustomArchitecture />}
-      </div>
+      {/* Architecture Section */}
+      {activeSection === 'architecture' && (
+        <div className="space-y-6">
+          {/* Main Architecture Diagram */}
+          <div className="bg-[#12121f] border border-white/10 rounded-xl p-6">
+            <div className="text-center mb-6">
+              <span className="px-3 py-1 bg-blue-500/20 text-blue-400 rounded-full text-xs font-medium">
+                Microsoft Copilot Studio + Power Platform + SAP Integration
+              </span>
+            </div>
 
-      {/* Pros/Cons */}
-      <div className="grid grid-cols-2 gap-6">
-        <div className="bg-green-500/5 border border-green-500/20 rounded-xl p-4">
-          <h4 className="text-sm font-semibold text-green-400 mb-3 flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4" /> Advantages
-          </h4>
-          <ul className="space-y-2">
-            {approaches[selectedApproach].pros.map((pro, i) => (
-              <li key={i} className="text-sm text-white/70 flex items-center gap-2">
-                <div className="w-1 h-1 rounded-full bg-green-400" />
-                {pro}
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div className="bg-orange-500/5 border border-orange-500/20 rounded-xl p-4">
-          <h4 className="text-sm font-semibold text-orange-400 mb-3 flex items-center gap-2">
-            <Settings className="w-4 h-4" /> Considerations
-          </h4>
-          <ul className="space-y-2">
-            {approaches[selectedApproach].cons.map((con, i) => (
-              <li key={i} className="text-sm text-white/70 flex items-center gap-2">
-                <div className="w-1 h-1 rounded-full bg-orange-400" />
-                {con}
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-    </div>
-  );
-}
+            <div className="grid grid-cols-5 gap-4 items-start">
+              {/* User Layer */}
+              <div className="space-y-3">
+                <div className="text-xs text-white/40 text-center font-medium uppercase tracking-wider">User Layer</div>
+                <ArchBox icon={Users} label="End Users" sublabel="Microsoft Teams" color="purple" />
+                <Arrow />
+                <ArchBox icon={MessageSquare} label="Microsoft 365 Copilot" sublabel="$30/user/month" color="purple" />
+              </div>
 
-// Recommended Architecture Diagram
-function RecommendedArchitecture() {
-  return (
-    <div className="relative">
-      {/* Title */}
-      <div className="text-center mb-8">
-        <span className="px-3 py-1 bg-blue-500/20 text-blue-400 rounded-full text-xs font-medium">
-          Azure-Native Agentic Architecture
-        </span>
-      </div>
+              {/* AI Layer */}
+              <div className="space-y-3">
+                <div className="text-xs text-white/40 text-center font-medium uppercase tracking-wider">AI Agent Layer</div>
+                <ArchBox icon={Brain} label="Copilot Studio" sublabel="Agent Builder" color="blue" />
+                <Arrow />
+                <ArchBox icon={Cloud} label="Azure OpenAI" sublabel="GPT-4 Turbo" color="blue" />
+                <Arrow />
+                <ArchBox icon={Workflow} label="Power Automate" sublabel="Flow Orchestration" color="cyan" />
+              </div>
 
-      {/* Diagram */}
-      <div className="flex items-start justify-between gap-4">
-        {/* User Layer */}
-        <div className="flex flex-col items-center">
-          <ArchBox
-            icon={Users}
-            label="End Users"
-            sublabel="Microsoft 365 / Teams"
-            color="purple"
-          />
-          <Arrow />
-          <ArchBox
-            icon={MessageSquare}
-            label="Microsoft Copilot"
-            sublabel="Natural Language Interface"
-            color="purple"
-          />
-        </div>
+              {/* Integration Layer */}
+              <div className="space-y-3">
+                <div className="text-xs text-white/40 text-center font-medium uppercase tracking-wider">Integration</div>
+                <ArchBox icon={Network} label="Azure API Mgmt" sublabel="Gateway & Security" color="yellow" />
+                <Arrow />
+                <ArchBox icon={Server} label="SAP ERP Connector" sublabel="Premium Connector" color="yellow" />
+                <Arrow />
+                <ArchBox icon={Lock} label="On-Prem Gateway" sublabel="Secure Tunnel" color="orange" />
+              </div>
 
-        {/* Azure Layer */}
-        <div className="flex flex-col items-center">
-          <div className="text-xs text-white/40 mb-2">Azure Cloud</div>
-          <div className="border border-blue-500/30 rounded-xl p-4 bg-blue-500/5">
-            <div className="flex flex-col items-center gap-3">
-              <ArchBox
-                icon={Cloud}
-                label="Azure OpenAI"
-                sublabel="GPT-4 Turbo"
-                color="blue"
-                small
-              />
-              <Arrow small />
-              <ArchBox
-                icon={Brain}
-                label="AI Agent"
-                sublabel="Intent & Entity Processing"
-                color="teal"
-                small
-              />
-              <Arrow small />
-              <ArchBox
-                icon={Workflow}
-                label="Azure Logic Apps"
-                sublabel="Orchestration Layer"
-                color="cyan"
-                small
-              />
+              {/* Translation Layer */}
+              <div className="space-y-3">
+                <div className="text-xs text-white/40 text-center font-medium uppercase tracking-wider">SAP Translation</div>
+                <ArchBox icon={Code} label="SAP NCo 3.1" sublabel=".NET Connector" color="orange" />
+                <Arrow />
+                <ArchBox icon={Settings} label="BAPI/RFC" sublabel="Function Calls" color="orange" />
+                <Arrow />
+                <ArchBox icon={FileText} label="OData Services" sublabel="REST APIs" color="orange" />
+              </div>
+
+              {/* SAP Layer */}
+              <div className="space-y-3">
+                <div className="text-xs text-white/40 text-center font-medium uppercase tracking-wider">SAP Systems</div>
+                <ArchBox icon={Database} label="SAP ECC/S4HANA" sublabel="ERP Core" color="green" />
+                <div className="mt-3 p-2 bg-white/5 rounded-lg">
+                  <div className="text-[10px] text-white/40 mb-1">SAP Tables</div>
+                  <div className="flex flex-wrap gap-1">
+                    {['LFA1', 'KNA1', 'MARA', 'EKKO', 'VBAK', 'LIKP'].map(t => (
+                      <span key={t} className="px-1.5 py-0.5 bg-green-500/20 text-green-400 rounded text-[9px] font-mono">{t}</span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Connection Legend */}
+            <div className="flex justify-center gap-8 mt-6 pt-4 border-t border-white/10">
+              <div className="flex items-center gap-2 text-xs text-white/50">
+                <div className="w-8 h-0.5 bg-gradient-to-r from-purple-500 to-blue-500 rounded" />
+                <span>User → Cloud (HTTPS)</span>
+              </div>
+              <div className="flex items-center gap-2 text-xs text-white/50">
+                <div className="w-8 h-0.5 bg-gradient-to-r from-yellow-500 to-orange-500 rounded" />
+                <span>Cloud → On-Prem (Secure Gateway)</span>
+              </div>
+              <div className="flex items-center gap-2 text-xs text-white/50">
+                <div className="w-8 h-0.5 bg-gradient-to-r from-orange-500 to-green-500 rounded" />
+                <span>Gateway → SAP (RFC/OData)</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Key Components */}
+          <div className="grid grid-cols-3 gap-4">
+            <div className="bg-blue-500/5 border border-blue-500/20 rounded-xl p-4">
+              <h4 className="text-sm font-semibold text-blue-400 mb-2 flex items-center gap-2">
+                <Brain className="w-4 h-4" /> Copilot Studio
+              </h4>
+              <p className="text-xs text-white/60 mb-2">Low-code agent builder with native SAP connectors. Handles intent recognition, entity extraction, and response generation.</p>
+              <div className="text-[10px] text-white/40">• Natural language understanding</div>
+              <div className="text-[10px] text-white/40">• Pre-built SAP actions</div>
+              <div className="text-[10px] text-white/40">• Microsoft Entra ID SSO</div>
+            </div>
+            <div className="bg-yellow-500/5 border border-yellow-500/20 rounded-xl p-4">
+              <h4 className="text-sm font-semibold text-yellow-400 mb-2 flex items-center gap-2">
+                <Server className="w-4 h-4" /> SAP ERP Connector
+              </h4>
+              <p className="text-xs text-white/60 mb-2">Premium Power Platform connector enabling direct RFC/BAPI calls through on-premises data gateway.</p>
+              <div className="text-[10px] text-white/40">• RFC & BAPI invocation</div>
+              <div className="text-[10px] text-white/40">• Dynamic schema discovery</div>
+              <div className="text-[10px] text-white/40">• SAP/Windows/Entra auth</div>
+            </div>
+            <div className="bg-orange-500/5 border border-orange-500/20 rounded-xl p-4">
+              <h4 className="text-sm font-semibold text-orange-400 mb-2 flex items-center gap-2">
+                <Lock className="w-4 h-4" /> On-Premises Gateway
+              </h4>
+              <p className="text-xs text-white/60 mb-2">Secure bridge between cloud services and on-premises SAP. Requires SAP NCo 3.1 connector installed.</p>
+              <div className="text-[10px] text-white/40">• Encrypted tunnel to Azure</div>
+              <div className="text-[10px] text-white/40">• High availability clustering</div>
+              <div className="text-[10px] text-white/40">• Kerberos delegation support</div>
             </div>
           </div>
         </div>
+      )}
 
-        {/* Integration Layer */}
-        <div className="flex flex-col items-center">
-          <div className="text-xs text-white/40 mb-2">Integration</div>
-          <div className="border border-yellow-500/30 rounded-xl p-4 bg-yellow-500/5">
-            <div className="flex flex-col items-center gap-3">
-              <ArchBox
-                icon={Network}
-                label="Azure API Management"
-                sublabel="Gateway & Security"
-                color="yellow"
-                small
-              />
-              <Arrow small />
-              <ArchBox
-                icon={Server}
-                label="SAP Connector"
-                sublabel="On-premises Data Gateway"
-                color="orange"
-                small
-              />
+      {/* Data Flow Section */}
+      {activeSection === 'dataflow' && (
+        <div className="space-y-6">
+          {/* End-to-End Flow */}
+          <div className="bg-[#12121f] border border-white/10 rounded-xl p-6">
+            <h3 className="text-sm font-semibold text-white mb-4">End-to-End Request Flow</h3>
+            <div className="space-y-3">
+              {[
+                { step: 1, title: 'User Query in Teams', desc: 'User types: "Show me all open POs from Acme Industrial"', tech: 'Microsoft Teams → Copilot Studio', time: '~50ms' },
+                { step: 2, title: 'Intent Classification', desc: 'Azure OpenAI GPT-4 identifies intent: LIST_PURCHASE_ORDERS with entity: vendor="Acme Industrial"', tech: 'Copilot Studio → Azure OpenAI', time: '~200ms' },
+                { step: 3, title: 'Action Mapping', desc: 'Copilot Studio maps to SAP ERP connector action: "Call BAPI_PO_GETITEMS"', tech: 'Agent Action → Power Automate', time: '~30ms' },
+                { step: 4, title: 'Gateway Routing', desc: 'Power Automate routes request through on-premises data gateway to SAP system', tech: 'Azure → On-Prem Gateway', time: '~100ms' },
+                { step: 5, title: 'SAP RFC Execution', desc: 'SAP NCo 3.1 translates to RFC call, executes BAPI_PO_GETITEMS with vendor filter', tech: 'Gateway → SAP via RFC', time: '~300ms' },
+                { step: 6, title: 'Response Generation', desc: 'Results formatted as Adaptive Card showing PO list with details', tech: 'SAP → User via Teams', time: '~100ms' },
+              ].map(({ step, title, desc, tech, time }) => (
+                <div key={step} className="flex gap-4 items-start">
+                  <div className="w-8 h-8 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center text-sm font-bold flex-shrink-0">
+                    {step}
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between">
+                      <h4 className="text-sm font-medium text-white">{title}</h4>
+                      <span className="text-xs text-white/40">{time}</span>
+                    </div>
+                    <p className="text-xs text-white/60 mt-0.5">{desc}</p>
+                    <div className="text-[10px] text-cyan-400 mt-1 font-mono">{tech}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="mt-4 pt-4 border-t border-white/10 flex items-center justify-between">
+              <span className="text-xs text-white/40">Total Round-Trip Time (typical)</span>
+              <span className="text-sm font-semibold text-green-400">~780ms</span>
+            </div>
+          </div>
+
+          {/* Technical Requirements */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="bg-white/5 border border-white/10 rounded-xl p-4">
+              <h4 className="text-sm font-semibold text-white mb-3">On-Premises Requirements</h4>
+              <div className="space-y-2 text-xs">
+                <div className="flex justify-between text-white/70"><span>On-Premises Data Gateway</span><span className="text-cyan-400">v3000.194+</span></div>
+                <div className="flex justify-between text-white/70"><span>SAP NCo .NET Connector</span><span className="text-cyan-400">v3.1.3.0 (64-bit)</span></div>
+                <div className="flex justify-between text-white/70"><span>Microsoft C++ Runtime</span><span className="text-cyan-400">v14.x</span></div>
+                <div className="flex justify-between text-white/70"><span>.NET Framework</span><span className="text-cyan-400">4.6.2 - 4.8.1</span></div>
+                <div className="flex justify-between text-white/70"><span>SAP Kernel</span><span className="text-cyan-400">RFC-enabled</span></div>
+              </div>
+            </div>
+            <div className="bg-white/5 border border-white/10 rounded-xl p-4">
+              <h4 className="text-sm font-semibold text-white mb-3">SAP Authorization Requirements</h4>
+              <div className="space-y-2 text-xs">
+                <div className="flex justify-between text-white/70"><span>RFC_METADATA access</span><span className="text-green-400">Required</span></div>
+                <div className="flex justify-between text-white/70"><span>S-User for NCo download</span><span className="text-green-400">Required</span></div>
+                <div className="flex justify-between text-white/70"><span>BAPI authorization</span><span className="text-green-400">Per function</span></div>
+                <div className="flex justify-between text-white/70"><span>Network port 3300</span><span className="text-green-400">Open to gateway</span></div>
+                <div className="flex justify-between text-white/70"><span>Principal propagation</span><span className="text-yellow-400">Recommended</span></div>
+              </div>
+            </div>
+          </div>
+
+          {/* Connector Limitations */}
+          <div className="bg-orange-500/5 border border-orange-500/20 rounded-xl p-4">
+            <h4 className="text-sm font-semibold text-orange-400 mb-2 flex items-center gap-2">
+              <Settings className="w-4 h-4" /> SAP ERP Connector Limitations
+            </h4>
+            <div className="grid grid-cols-2 gap-4 text-xs text-white/60">
+              <div>• Supports only RFCs and BAPIs (no IDocs)</div>
+              <div>• 2MB payload limit for write operations</div>
+              <div>• 8MB compressed response limit for reads</div>
+              <div>• Transactional RFCs (tRFCs) not supported</div>
+              <div>• Cannot receive messages from SAP server</div>
+              <div>• Gateway cluster requires load balancing OFF</div>
             </div>
           </div>
         </div>
+      )}
 
-        {/* SAP Layer */}
-        <div className="flex flex-col items-center">
-          <div className="text-xs text-white/40 mb-2">SAP Systems</div>
-          <div className="border border-orange-500/30 rounded-xl p-4 bg-orange-500/5">
-            <div className="flex flex-col items-center gap-3">
-              <ArchBox
-                icon={Database}
-                label="SAP ECC/S4HANA"
-                sublabel="ERP System"
-                color="orange"
-                small
-              />
-              <div className="text-xs text-white/30 my-1">BAPI / RFC / OData</div>
-              <div className="flex gap-2">
-                <span className="px-2 py-0.5 bg-white/10 text-white/50 rounded text-[10px]">LFA1</span>
-                <span className="px-2 py-0.5 bg-white/10 text-white/50 rounded text-[10px]">EKKO</span>
-                <span className="px-2 py-0.5 bg-white/10 text-white/50 rounded text-[10px]">MARA</span>
+      {/* Cost Analysis Section */}
+      {activeSection === 'costs' && (
+        <div className="space-y-6">
+          {/* Pricing Summary */}
+          <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/20 rounded-xl p-6">
+            <h3 className="text-lg font-semibold text-white mb-4">Cost Analysis - Microsoft Copilot Studio + SAP Integration</h3>
+            <p className="text-sm text-white/60 mb-4">Based on official Microsoft pricing as of January 2025. All costs in USD.</p>
+
+            {/* Copilot Credits Table */}
+            <div className="bg-black/20 rounded-lg p-4 mb-4">
+              <h4 className="text-sm font-semibold text-blue-400 mb-3">Copilot Studio Credit Consumption</h4>
+              <div className="overflow-x-auto">
+                <table className="w-full text-xs">
+                  <thead>
+                    <tr className="text-white/40 border-b border-white/10">
+                      <th className="text-left py-2 pr-4">Event Type</th>
+                      <th className="text-right py-2 pr-4">Credits</th>
+                      <th className="text-right py-2 pr-4">Cost @ $0.01/credit</th>
+                      <th className="text-left py-2">Notes</th>
+                    </tr>
+                  </thead>
+                  <tbody className="text-white/70">
+                    <tr className="border-b border-white/5">
+                      <td className="py-2 pr-4">Classic Response</td>
+                      <td className="text-right pr-4 font-mono text-cyan-400">1</td>
+                      <td className="text-right pr-4">$0.01</td>
+                      <td className="text-white/40">Pre-defined answers</td>
+                    </tr>
+                    <tr className="border-b border-white/5">
+                      <td className="py-2 pr-4">Generative Response</td>
+                      <td className="text-right pr-4 font-mono text-cyan-400">2</td>
+                      <td className="text-right pr-4">$0.02</td>
+                      <td className="text-white/40">AI-generated answers</td>
+                    </tr>
+                    <tr className="border-b border-white/5">
+                      <td className="py-2 pr-4">Agent Action (SAP call)</td>
+                      <td className="text-right pr-4 font-mono text-cyan-400">5</td>
+                      <td className="text-right pr-4">$0.05</td>
+                      <td className="text-white/40">Each SAP connector call</td>
+                    </tr>
+                    <tr className="border-b border-white/5">
+                      <td className="py-2 pr-4">Tenant Graph Grounding</td>
+                      <td className="text-right pr-4 font-mono text-cyan-400">10</td>
+                      <td className="text-right pr-4">$0.10</td>
+                      <td className="text-white/40">SharePoint/OneDrive search</td>
+                    </tr>
+                    <tr className="border-b border-white/5">
+                      <td className="py-2 pr-4">Agent Flow (per 100 actions)</td>
+                      <td className="text-right pr-4 font-mono text-cyan-400">13</td>
+                      <td className="text-right pr-4">$0.13</td>
+                      <td className="text-white/40">Power Automate flows</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Licensing Options */}
+            <div className="grid grid-cols-2 gap-4 mb-4">
+              <div className="bg-black/20 rounded-lg p-4">
+                <h4 className="text-sm font-semibold text-green-400 mb-2">Option A: Capacity Packs</h4>
+                <div className="text-2xl font-bold text-white mb-1">$200<span className="text-sm font-normal text-white/40">/month</span></div>
+                <div className="text-xs text-white/60 mb-2">25,000 Copilot Credits included</div>
+                <div className="text-[10px] text-white/40">Best for: Predictable, high-volume usage</div>
+              </div>
+              <div className="bg-black/20 rounded-lg p-4">
+                <h4 className="text-sm font-semibold text-yellow-400 mb-2">Option B: Pay-As-You-Go</h4>
+                <div className="text-2xl font-bold text-white mb-1">$0.01<span className="text-sm font-normal text-white/40">/credit</span></div>
+                <div className="text-xs text-white/60 mb-2">Billed via Azure subscription</div>
+                <div className="text-[10px] text-white/40">Best for: Variable or low-volume usage</div>
+              </div>
+            </div>
+
+            {/* Example Scenario */}
+            <div className="bg-black/20 rounded-lg p-4">
+              <h4 className="text-sm font-semibold text-purple-400 mb-3">Example: 500 Users, 20 SAP queries/user/month</h4>
+              <div className="grid grid-cols-4 gap-4 text-xs">
+                <div>
+                  <div className="text-white/40 mb-1">Monthly Queries</div>
+                  <div className="text-lg font-semibold text-white">10,000</div>
+                </div>
+                <div>
+                  <div className="text-white/40 mb-1">Avg Credits/Query</div>
+                  <div className="text-lg font-semibold text-white">~8</div>
+                  <div className="text-[10px] text-white/40">(2 gen + 1 action + 5 SAP)</div>
+                </div>
+                <div>
+                  <div className="text-white/40 mb-1">Total Credits</div>
+                  <div className="text-lg font-semibold text-white">80,000</div>
+                </div>
+                <div>
+                  <div className="text-white/40 mb-1">Monthly Cost</div>
+                  <div className="text-lg font-semibold text-green-400">$800</div>
+                  <div className="text-[10px] text-white/40">(4 packs @ $200)</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Additional Costs */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="bg-white/5 border border-white/10 rounded-xl p-4">
+              <h4 className="text-sm font-semibold text-white mb-3">Additional Microsoft Costs</h4>
+              <div className="space-y-2 text-xs">
+                <div className="flex justify-between text-white/70">
+                  <span>Microsoft 365 Copilot</span>
+                  <span className="text-cyan-400">$30/user/mo</span>
+                </div>
+                <div className="flex justify-between text-white/70">
+                  <span>Power Automate Premium</span>
+                  <span className="text-cyan-400">$15/user/mo</span>
+                </div>
+                <div className="flex justify-between text-white/70">
+                  <span>Azure API Mgmt (Consumption)</span>
+                  <span className="text-cyan-400">$3.50/million calls</span>
+                </div>
+                <div className="flex justify-between text-white/70">
+                  <span>On-Premises Data Gateway</span>
+                  <span className="text-green-400">Included</span>
+                </div>
+              </div>
+            </div>
+            <div className="bg-white/5 border border-white/10 rounded-xl p-4">
+              <h4 className="text-sm font-semibold text-white mb-3">One-Time Implementation Costs</h4>
+              <div className="space-y-2 text-xs">
+                <div className="flex justify-between text-white/70">
+                  <span>Gateway Server (VM)</span>
+                  <span className="text-cyan-400">~$200/mo (Azure)</span>
+                </div>
+                <div className="flex justify-between text-white/70">
+                  <span>SAP NCo License</span>
+                  <span className="text-green-400">Free (with SAP)</span>
+                </div>
+                <div className="flex justify-between text-white/70">
+                  <span>Implementation Services</span>
+                  <span className="text-yellow-400">Contact Penguin</span>
+                </div>
+                <div className="flex justify-between text-white/70">
+                  <span>Training & Enablement</span>
+                  <span className="text-yellow-400">Contact Penguin</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* M365 Copilot Users Note */}
+          <div className="bg-green-500/5 border border-green-500/20 rounded-xl p-4">
+            <h4 className="text-sm font-semibold text-green-400 mb-2 flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4" /> Microsoft 365 Copilot License Benefit
+            </h4>
+            <p className="text-xs text-white/60">
+              Users licensed for Microsoft 365 Copilot ($30/user/month) get internal agent interactions at <strong className="text-green-400">no additional credit cost</strong> when
+              the agent operates using that user&apos;s identity. This significantly reduces costs for organizations already invested in M365 Copilot.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Discovery Questions Section */}
+      {activeSection === 'discovery' && (
+        <div className="space-y-6">
+          <div className="bg-gradient-to-r from-purple-500/10 to-blue-500/10 border border-purple-500/20 rounded-xl p-6">
+            <h3 className="text-lg font-semibold text-white mb-2">Discovery Questions</h3>
+            <p className="text-sm text-white/60 mb-4">These questions help us tailor the architecture to your specific requirements.</p>
+
+            {/* Questions Grid */}
+            <div className="space-y-4">
+              {[
+                {
+                  category: 'SAP Environment',
+                  color: 'orange',
+                  questions: [
+                    { q: 'Which SAP system are you running?', impact: 'Determines connector approach (ECC vs S/4HANA Cloud)', options: ['SAP ECC 6.0', 'S/4HANA On-Prem', 'S/4HANA Cloud (RISE)', 'Multiple systems'] },
+                    { q: 'Are your required operations exposed via OData?', impact: 'If yes, can use OData connector (simpler). If no, requires RFC/BAPI via gateway', options: ['Yes, fully', 'Partially', 'No, RFC only'] },
+                    { q: 'Do you have SAP Integration Suite / BTP?', impact: 'Can leverage existing SAP API Management if available', options: ['Yes', 'No', 'Planned'] },
+                  ]
+                },
+                {
+                  category: 'Security & Identity',
+                  color: 'blue',
+                  questions: [
+                    { q: 'Is SAP integrated with Microsoft Entra ID?', impact: 'Enables SSO and principal propagation for seamless auth', options: ['Yes', 'No, SAP-only auth', 'In progress'] },
+                    { q: 'Do you require principal propagation?', impact: 'Ensures SAP actions execute with user\'s SAP permissions', options: ['Yes, mandatory', 'Nice to have', 'Not required'] },
+                    { q: 'What are your data residency requirements?', impact: 'Affects Azure region selection for gateway and services', options: ['US only', 'EU only', 'Specific country', 'No restrictions'] },
+                  ]
+                },
+                {
+                  category: 'Scale & Performance',
+                  color: 'green',
+                  questions: [
+                    { q: 'How many users will access the SAP Copilot?', impact: 'Determines licensing model (capacity packs vs PAYG)', options: ['< 100', '100-500', '500-2000', '2000+'] },
+                    { q: 'Expected queries per user per day?', impact: 'Calculates monthly credit consumption for cost planning', options: ['1-5', '5-20', '20-50', '50+'] },
+                    { q: 'Do you need real-time or batch operations?', impact: 'Real-time uses gateway; batch might use different patterns', options: ['Real-time only', 'Batch only', 'Both'] },
+                  ]
+                },
+                {
+                  category: 'Network & Infrastructure',
+                  color: 'yellow',
+                  questions: [
+                    { q: 'Where is your SAP system hosted?', impact: 'Determines gateway placement for optimal latency', options: ['On-premises datacenter', 'Azure IaaS', 'AWS/GCP', 'SAP-hosted (RISE)'] },
+                    { q: 'Can you deploy a Windows VM in SAP\'s network?', impact: 'Required for on-premises data gateway installation', options: ['Yes', 'Requires approval', 'No - cloud only'] },
+                    { q: 'Do you have existing Azure subscriptions?', impact: 'Affects billing setup and resource organization', options: ['Yes, production', 'Dev/test only', 'Need to create'] },
+                  ]
+                },
+              ].map(({ category, color, questions }) => (
+                <div key={category} className={`bg-${color}-500/5 border border-${color}-500/20 rounded-lg p-4`}>
+                  <h4 className={`text-sm font-semibold text-${color}-400 mb-3`}>{category}</h4>
+                  <div className="space-y-3">
+                    {questions.map(({ q, impact, options }, i) => (
+                      <div key={i} className="bg-black/20 rounded-lg p-3">
+                        <div className="text-sm text-white font-medium mb-1">{q}</div>
+                        <div className="text-[10px] text-white/40 mb-2">Impact: {impact}</div>
+                        <div className="flex flex-wrap gap-1">
+                          {options.map((opt, j) => (
+                            <span key={j} className="px-2 py-0.5 bg-white/10 text-white/60 rounded text-[10px]">{opt}</span>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Architecture Decision Points */}
+          <div className="bg-white/5 border border-white/10 rounded-xl p-4">
+            <h4 className="text-sm font-semibold text-white mb-3">Key Architecture Decision Points</h4>
+            <div className="grid grid-cols-2 gap-4 text-xs">
+              <div className="space-y-2">
+                <div className="text-white/70"><strong className="text-cyan-400">If OData available:</strong> Use SAP OData connector through Azure API Management - simpler, faster implementation</div>
+                <div className="text-white/70"><strong className="text-cyan-400">If RFC/BAPI only:</strong> Use SAP ERP connector with on-premises gateway - full SAP function module access</div>
+                <div className="text-white/70"><strong className="text-cyan-400">If S/4HANA Cloud (RISE):</strong> Consider SAP Graph API or direct OData - no gateway needed</div>
+              </div>
+              <div className="space-y-2">
+                <div className="text-white/70"><strong className="text-yellow-400">High security:</strong> Enable principal propagation with Kerberos delegation</div>
+                <div className="text-white/70"><strong className="text-yellow-400">High volume:</strong> Deploy gateway cluster (2+ nodes) with Azure API Management caching</div>
+                <div className="text-white/70"><strong className="text-yellow-400">M365 Copilot users:</strong> Design for employee-facing to leverage included credits</div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-
-      {/* Data Flow Labels */}
-      <div className="flex justify-center gap-8 mt-8">
-        <div className="flex items-center gap-2 text-xs text-white/40">
-          <div className="w-8 h-0.5 bg-gradient-to-r from-purple-500 to-blue-500" />
-          <span>Request Flow</span>
-        </div>
-        <div className="flex items-center gap-2 text-xs text-white/40">
-          <div className="w-8 h-0.5 bg-gradient-to-r from-orange-500 to-green-500" />
-          <span>Response Flow</span>
-        </div>
-      </div>
+      )}
     </div>
   );
 }
 
-// BTP Architecture Diagram
-function BTPArchitecture() {
-  return (
-    <div className="relative">
-      <div className="text-center mb-8">
-        <span className="px-3 py-1 bg-teal-500/20 text-teal-400 rounded-full text-xs font-medium">
-          SAP BTP Integration Suite
-        </span>
-      </div>
-
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex flex-col items-center">
-          <ArchBox icon={Users} label="End Users" sublabel="Web / Mobile" color="purple" />
-          <Arrow />
-          <ArchBox icon={MessageSquare} label="Custom UI" sublabel="React / Fiori" color="purple" />
-        </div>
-
-        <div className="flex flex-col items-center">
-          <div className="text-xs text-white/40 mb-2">SAP BTP</div>
-          <div className="border border-teal-500/30 rounded-xl p-4 bg-teal-500/5">
-            <div className="flex flex-col items-center gap-3">
-              <ArchBox icon={Cloud} label="SAP AI Core" sublabel="LLM Processing" color="teal" small />
-              <Arrow small />
-              <ArchBox icon={Workflow} label="Integration Suite" sublabel="Pre-built iFlows" color="teal" small />
-              <Arrow small />
-              <ArchBox icon={Network} label="Cloud Connector" sublabel="Secure Tunnel" color="teal" small />
-            </div>
-          </div>
-        </div>
-
-        <div className="flex flex-col items-center">
-          <div className="text-xs text-white/40 mb-2">On-Premises</div>
-          <ArchBox icon={Database} label="SAP ECC/S4HANA" sublabel="ERP System" color="orange" />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// Custom Middleware Architecture
-function CustomArchitecture() {
-  return (
-    <div className="relative">
-      <div className="text-center mb-8">
-        <span className="px-3 py-1 bg-yellow-500/20 text-yellow-400 rounded-full text-xs font-medium">
-          Custom Middleware Solution
-        </span>
-      </div>
-
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex flex-col items-center">
-          <ArchBox icon={Users} label="End Users" sublabel="Web Interface" color="purple" />
-          <Arrow />
-          <ArchBox icon={MessageSquare} label="Frontend App" sublabel="Next.js / React" color="purple" />
-        </div>
-
-        <div className="flex flex-col items-center">
-          <div className="text-xs text-white/40 mb-2">Custom Backend</div>
-          <div className="border border-yellow-500/30 rounded-xl p-4 bg-yellow-500/5">
-            <div className="flex flex-col items-center gap-3">
-              <ArchBox icon={Server} label="API Server" sublabel="Node.js / Python" color="yellow" small />
-              <Arrow small />
-              <ArchBox icon={Brain} label="NLP Engine" sublabel="OpenAI API" color="yellow" small />
-              <Arrow small />
-              <ArchBox icon={Code} label="RFC SDK" sublabel="SAP NW RFC" color="yellow" small />
-            </div>
-          </div>
-        </div>
-
-        <div className="flex flex-col items-center">
-          <div className="text-xs text-white/40 mb-2">SAP</div>
-          <ArchBox icon={Database} label="SAP System" sublabel="RFC Enabled" color="orange" />
-        </div>
-      </div>
-    </div>
-  );
-}
 
 // Architecture Box Component
 function ArchBox({ icon: Icon, label, sublabel, color, small = false }: {
