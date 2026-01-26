@@ -1,0 +1,454 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --azure-primary: #0078D4;
+  --azure-secondary: #00BCF2;
+  --copilot-purple: #7B68EE;
+  --copilot-teal: #00B294;
+  --sap-gold: #F0AB00;
+  --sap-blue: #0070F2;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Roboto', sans-serif;
+  background: linear-gradient(135deg, #0a0a1a 0%, #1a1a2e 50%, #16213e 100%);
+  min-height: 100vh;
+  color: #ffffff;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 120, 212, 0.4);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 120, 212, 0.6);
+}
+
+/* Glowing effects */
+.glow-azure {
+  box-shadow: 0 0 20px rgba(0, 120, 212, 0.4),
+              0 0 40px rgba(0, 120, 212, 0.2),
+              0 0 60px rgba(0, 120, 212, 0.1);
+}
+
+.glow-copilot {
+  box-shadow: 0 0 20px rgba(123, 104, 238, 0.4),
+              0 0 40px rgba(0, 120, 212, 0.2),
+              0 0 60px rgba(0, 178, 148, 0.1);
+}
+
+.glow-success {
+  box-shadow: 0 0 15px rgba(16, 124, 16, 0.5);
+}
+
+.glow-processing {
+  box-shadow: 0 0 15px rgba(0, 120, 212, 0.5);
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(0, 120, 212, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(0, 120, 212, 0.8);
+  }
+}
+
+/* Glass morphism */
+.glass {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.glass-dark {
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Gradient text */
+.text-gradient-copilot {
+  background: linear-gradient(135deg, #7B68EE 0%, #0078D4 50%, #00B294 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-gradient-azure {
+  background: linear-gradient(135deg, #0078D4 0%, #00BCF2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Pipeline flow animation */
+.flow-line {
+  background: linear-gradient(90deg, transparent, #0078D4, transparent);
+  background-size: 200% 100%;
+  animation: flow-animation 2s linear infinite;
+}
+
+@keyframes flow-animation {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Data flow particles */
+.data-particle {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: #00BCF2;
+  border-radius: 50%;
+  animation: particle-flow 2s linear infinite;
+}
+
+@keyframes particle-flow {
+  0% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(100px);
+    opacity: 0;
+  }
+}
+
+/* Typing animation */
+.typing-cursor {
+  display: inline-block;
+  width: 2px;
+  height: 1.2em;
+  background: #0078D4;
+  margin-left: 2px;
+  animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* Code block styling */
+.code-block {
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(0, 120, 212, 0.3);
+  border-radius: 8px;
+  padding: 1rem;
+  overflow-x: auto;
+}
+
+.code-keyword {
+  color: #569CD6;
+}
+
+.code-string {
+  color: #CE9178;
+}
+
+.code-function {
+  color: #DCDCAA;
+}
+
+.code-comment {
+  color: #6A9955;
+}
+
+.code-number {
+  color: #B5CEA8;
+}
+
+/* Status badges */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.status-success {
+  background: rgba(16, 124, 16, 0.2);
+  color: #4ade80;
+  border: 1px solid rgba(16, 124, 16, 0.4);
+}
+
+.status-processing {
+  background: rgba(0, 120, 212, 0.2);
+  color: #60a5fa;
+  border: 1px solid rgba(0, 120, 212, 0.4);
+}
+
+.status-pending {
+  background: rgba(255, 185, 0, 0.2);
+  color: #fbbf24;
+  border: 1px solid rgba(255, 185, 0, 0.4);
+}
+
+.status-error {
+  background: rgba(209, 52, 56, 0.2);
+  color: #f87171;
+  border: 1px solid rgba(209, 52, 56, 0.4);
+}
+
+/* Pipeline node */
+.pipeline-node {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.pipeline-node.active {
+  transform: scale(1.05);
+}
+
+.pipeline-node.completed {
+  border-color: #107C10;
+}
+
+/* Connector lines */
+.connector {
+  position: relative;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.connector.active .connector-fill {
+  animation: connector-flow 1s ease-out forwards;
+}
+
+@keyframes connector-flow {
+  0% {
+    width: 0%;
+    background: #0078D4;
+  }
+  100% {
+    width: 100%;
+    background: #107C10;
+  }
+}
+
+/* Chat interface */
+.chat-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+}
+
+.chat-input-container {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 1rem;
+}
+
+.message-bubble {
+  max-width: 80%;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  margin-bottom: 0.5rem;
+}
+
+.message-user {
+  background: linear-gradient(135deg, #0078D4 0%, #00529c 100%);
+  margin-left: auto;
+  border-bottom-right-radius: 4px;
+}
+
+.message-assistant {
+  background: rgba(255, 255, 255, 0.1);
+  margin-right: auto;
+  border-bottom-left-radius: 4px;
+}
+
+/* Table styling */
+.sap-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.sap-table th {
+  background: rgba(0, 120, 212, 0.2);
+  color: #60a5fa;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid rgba(0, 120, 212, 0.3);
+}
+
+.sap-table td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  font-size: 0.875rem;
+}
+
+.sap-table tr:hover td {
+  background: rgba(0, 120, 212, 0.1);
+}
+
+/* Card components */
+.card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  border-color: rgba(0, 120, 212, 0.3);
+  transform: translateY(-2px);
+}
+
+/* Stat cards */
+.stat-card {
+  background: linear-gradient(135deg, rgba(0, 120, 212, 0.1) 0%, rgba(0, 178, 148, 0.1) 100%);
+  border: 1px solid rgba(0, 120, 212, 0.2);
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+.stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #0078D4 0%, #00B294 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Logo styling */
+.logo-microsoft {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.logo-microsoft-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2px;
+  width: 20px;
+  height: 20px;
+}
+
+.logo-microsoft-grid div:nth-child(1) { background: #F25022; }
+.logo-microsoft-grid div:nth-child(2) { background: #7FBA00; }
+.logo-microsoft-grid div:nth-child(3) { background: #00A4EF; }
+.logo-microsoft-grid div:nth-child(4) { background: #FFB900; }
+
+/* Input styling */
+.input-modern {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  color: white;
+  width: 100%;
+  transition: all 0.2s ease;
+}
+
+.input-modern:focus {
+  outline: none;
+  border-color: #0078D4;
+  box-shadow: 0 0 0 2px rgba(0, 120, 212, 0.2);
+}
+
+.input-modern::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* Button styling */
+.btn-azure {
+  background: linear-gradient(135deg, #0078D4 0%, #00529c 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.75rem 1.5rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-azure:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 120, 212, 0.4);
+}
+
+.btn-azure:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Spinner */
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-top-color: #0078D4;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .pipeline-horizontal {
+    flex-direction: column;
+  }
+
+  .connector {
+    width: 4px;
+    height: 40px;
+  }
+}
