@@ -95,18 +95,7 @@ const intentPatterns: Array<{
       material: (m) => m,
     },
   },
-  // Shipment Tracking
-  {
-    patterns: [
-      /(?:where is|track|status of)\s+(?:shipment|delivery|order)?\s*(?:#|number|num)?\s*(.+)/i,
-      /(?:tracking|shipment)\s+(?:status|info|information)\s+(?:for\s+)?(.+)/i,
-    ],
-    intent: 'TRACK_SHIPMENT',
-    extractors: {
-      trackingId: (m) => m.trim(),
-    },
-  },
-  // Invoice Payment Status
+  // Invoice Payment Status - MUST come before shipment tracking to avoid "status of" collision
   {
     patterns: [
       /(?:what(?:'s| is)|check)\s+(?:the\s+)?(?:payment\s+)?status\s+(?:of|for)\s+invoice\s*(.+)/i,
@@ -117,6 +106,19 @@ const intentPatterns: Array<{
     intent: 'CHECK_INVOICE_STATUS',
     extractors: {
       invoiceRef: (m) => m.trim().replace(/\?$/, ''),
+    },
+  },
+  // Shipment Tracking - requires "shipment", "delivery", or tracking number pattern
+  {
+    patterns: [
+      /(?:where is|track)\s+(?:shipment|delivery|order)\s*(?:#|number|num)?\s*(.+)/i,
+      /(?:status of)\s+(?:shipment|delivery)\s*(?:#|number|num)?\s*(.+)/i,
+      /(?:tracking|shipment)\s+(?:status|info|information)\s+(?:for\s+)?(.+)/i,
+      /track\s+(?:#|number|num)?\s*([A-Z]{2,4}[-]?\d{6,})/i,
+    ],
+    intent: 'TRACK_SHIPMENT',
+    extractors: {
+      trackingId: (m) => m.trim(),
     },
   },
   // PO Status
