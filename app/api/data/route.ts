@@ -1,15 +1,25 @@
 import { NextResponse } from 'next/server';
-import * as db from '@/lib/database';
+import {
+  getVendors,
+  getCustomers,
+  getMaterials,
+  getPurchaseOrders,
+  getSalesOrders,
+  getDeliveries,
+  getInvoices,
+} from '@/lib/supabase';
 
 export async function GET() {
   try {
-    const vendors = db.getVendors();
-    const customers = db.getCustomers();
-    const materials = db.getMaterials();
-    const purchaseOrders = db.getPurchaseOrders();
-    const salesOrders = db.getSalesOrders();
-    const deliveries = db.getDeliveries();
-    const invoices = db.getInvoices();
+    const [vendors, customers, materials, purchaseOrders, salesOrders, deliveries, invoices] = await Promise.all([
+      getVendors(),
+      getCustomers(),
+      getMaterials(),
+      getPurchaseOrders(),
+      getSalesOrders(),
+      getDeliveries(),
+      getInvoices(),
+    ]);
 
     return NextResponse.json({
       vendors,

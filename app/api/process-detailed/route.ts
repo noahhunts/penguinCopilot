@@ -1,6 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { processNaturalLanguage, formatBAPICall } from '@/lib/nlp-processor';
-import * as db from '@/lib/database';
+import { processNaturalLanguage } from '@/lib/nlp-processor';
+import {
+  getVendors,
+  getCustomers,
+  getMaterials,
+  getPurchaseOrders,
+  getSalesOrders,
+  getDeliveries,
+  searchVendors,
+  searchCustomers,
+  searchMaterials,
+  checkMaterialAvailability,
+  getDeliveryByTracking,
+  getInvoicePaymentStatus,
+  createPurchaseOrder,
+  createSalesOrder,
+  getDashboardStats,
+} from '@/lib/supabase';
 
 export async function POST(request: NextRequest) {
   const startTime = Date.now();
@@ -44,12 +60,12 @@ export async function POST(request: NextRequest) {
         sqlQuery = generatePOCreateSQL(intent.entities);
         const poResult = await handleCreatePO(intent.entities);
         message = poResult.success
-          ? `Purchase Order ${poResult.ebeln} created successfully for $${poResult.totalValue?.toLocaleString()}`
+          ? `Purchase Order ${(poResult as any).ebeln} created successfully for $${(poResult as any).totalValue?.toLocaleString()}`
           : `Failed: ${poResult.error}`;
         result = poResult.success ? {
           type: 'po_created',
-          documentNumber: poResult.ebeln,
-          totalValue: poResult.totalValue,
+          documentNumber: (poResult as any).ebeln,
+          totalValue: (poResult as any).totalValue,
         } : null;
         rawData = poResult;
         break;
@@ -58,12 +74,12 @@ export async function POST(request: NextRequest) {
         sqlQuery = generateSOCreateSQL(intent.entities);
         const soResult = await handleCreateSO(intent.entities);
         message = soResult.success
-          ? `Sales Order ${soResult.vbeln} created successfully for $${soResult.totalValue?.toLocaleString()}`
+          ? `Sales Order ${(soResult as any).vbeln} created successfully for $${(soResult as any).totalValue?.toLocaleString()}`
           : `Failed: ${soResult.error}`;
         result = soResult.success ? {
           type: 'so_created',
-          documentNumber: soResult.vbeln,
-          totalValue: soResult.totalValue,
+          documentNumber: (soResult as any).vbeln,
+          totalValue: (soResult as any).totalValue,
         } : null;
         rawData = soResult;
         break;
@@ -118,16 +134,16 @@ WHERE r.XBLNR LIKE '%${intent.entities.invoiceRef}%'`;
 FROM EKKO e
 JOIN LFA1 v ON e.LIFNR = v.LIFNR
 ORDER BY e.BEDAT DESC`;
-        const pos = db.getPurchaseOrders();
+        const pos = await getPurchaseOrders();
         message = `Found ${pos.length} purchase orders.`;
         rawData = pos;
         result = {
           type: 'list',
           items: pos.map(po => ({
-            'PO #': po.EBELN,
-            'Vendor': po.VENDOR_NAME,
-            'Date': formatDate(po.BEDAT),
-            'Value': `$${po.NETWR.toLocaleString()}`,
+            'PO #': po.ebeln,
+            'Vendor': po.vendor_name,
+            'Date': formatDate(po.bedat),
+            'Value': `$${(po.netwr || 0).toLocaleString()}`,
           })),
         };
         break;
@@ -137,16 +153,16 @@ ORDER BY e.BEDAT DESC`;
 FROM VBAK s
 JOIN KNA1 c ON s.KUNNR = c.KUNNR
 ORDER BY s.ERDAT DESC`;
-        const sos = db.getSalesOrders();
+        const sos = await getSalesOrders();
         message = `Found ${sos.length} sales orders.`;
         rawData = sos;
         result = {
           type: 'list',
           items: sos.map(so => ({
-            'SO #': so.VBELN,
-            'Customer': so.CUSTOMER_NAME,
-            'Date': formatDate(so.ERDAT),
-            'Value': `$${so.NETWR.toLocaleString()}`,
+            'SO #': so.vbeln,
+            'Customer': so.customer_name,
+            'Date': formatDate(so.erdat),
+            'Value': `$${(so.netwr || 0).toLocaleString()}`,
           })),
         };
         break;
@@ -156,16 +172,16 @@ ORDER BY s.ERDAT DESC`;
 FROM LFA1
 WHERE NAME1 LIKE '%${intent.entities.query || ''}%'
 ORDER BY NAME1`;
-        const vendors = db.searchVendors(intent.entities.query || '');
+        const vendors = await searchVendors(intent.entities.query || '');
         message = `Found ${vendors.length} vendors.`;
         rawData = vendors;
         result = {
           type: 'list',
           items: vendors.map(v => ({
-            'ID': v.LIFNR,
-            'Name': v.NAME1,
-            'City': v.ORT01,
-            'State': v.REGIO,
+            'ID': v.lifnr,
+            'Name': v.name1,
+            'City': v.ort01,
+            'State': v.regio,
           })),
         };
         break;
@@ -178,16 +194,16 @@ JOIN MARC c ON m.MATNR = c.MATNR
 JOIN MARD d ON m.MATNR = d.MATNR
 WHERE t.MAKTX LIKE '%${intent.entities.query || ''}%'
 ORDER BY t.MAKTX`;
-        const materials = db.searchMaterials(intent.entities.query || '');
+        const materials = await searchMaterials(intent.entities.query || '');
         message = `Found ${materials.length} materials.`;
         rawData = materials;
         result = {
           type: 'list',
           items: materials.map(m => ({
-            'ID': m.MATNR,
-            'Description': m.MAKTX,
-            'Stock': m.LABST?.toLocaleString() || '0',
-            'Price': `$${m.STDPRICE?.toFixed(2) || '0.00'}`,
+            'ID': m.matnr,
+            'Description': m.maktx,
+            'Stock': m.labst?.toLocaleString() || '0',
+            'Price': `$${m.stdprice?.toFixed(2) || '0.00'}`,
           })),
         };
         break;
@@ -197,16 +213,16 @@ ORDER BY t.MAKTX`;
 FROM LFA1
 WHERE LOEVM = ''
 ORDER BY NAME1`;
-        const allVendors = db.getVendors();
+        const allVendors = await getVendors();
         message = `Found ${allVendors.length} vendors in the system.`;
         rawData = allVendors;
         result = {
           type: 'list',
           items: allVendors.map(v => ({
-            'Vendor ID': v.LIFNR,
-            'Name': v.NAME1,
-            'City': v.ORT01,
-            'State': v.REGIO,
+            'Vendor ID': v.lifnr,
+            'Name': v.name1,
+            'City': v.ort01,
+            'State': v.regio,
           })),
         };
         break;
@@ -216,16 +232,16 @@ ORDER BY NAME1`;
 FROM KNA1
 WHERE SPERR = ''
 ORDER BY NAME1`;
-        const allCustomers = db.getCustomers();
+        const allCustomers = await getCustomers();
         message = `Found ${allCustomers.length} customers in the system.`;
         rawData = allCustomers;
         result = {
           type: 'list',
           items: allCustomers.map(c => ({
-            'Customer ID': c.KUNNR,
-            'Name': c.NAME1,
-            'City': c.ORT01,
-            'Credit Limit': `$${c.CREDIT_LIMIT?.toLocaleString()}`,
+            'Customer ID': c.kunnr,
+            'Name': c.name1,
+            'City': c.ort01,
+            'Credit Limit': `$${(c.credit_limit || 0).toLocaleString()}`,
           })),
         };
         break;
@@ -238,17 +254,17 @@ JOIN MARC c ON m.MATNR = c.MATNR
 JOIN MARD d ON m.MATNR = d.MATNR
 WHERE m.LVORM = ''
 ORDER BY t.MAKTX`;
-        const allMaterials = db.getMaterials();
+        const allMaterials = await getMaterials();
         message = `Found ${allMaterials.length} materials in the system.`;
         rawData = allMaterials;
         result = {
           type: 'list',
           items: allMaterials.map(m => ({
-            'Material ID': m.MATNR,
-            'Description': m.MAKTX,
-            'Type': m.MTART,
-            'Stock': m.LABST?.toLocaleString() || '0',
-            'Price': `$${m.STDPRICE?.toFixed(2) || '0.00'}`,
+            'Material ID': m.matnr,
+            'Description': m.maktx,
+            'Type': m.mtart,
+            'Stock': m.labst?.toLocaleString() || '0',
+            'Price': `$${m.stdprice?.toFixed(2) || '0.00'}`,
           })),
         };
         break;
@@ -258,17 +274,17 @@ ORDER BY t.MAKTX`;
 FROM LIKP l
 JOIN KNA1 c ON l.KUNNR = c.KUNNR
 ORDER BY l.LFDAT DESC`;
-        const allDeliveries = db.getDeliveries();
+        const allDeliveries = await getDeliveries();
         message = `Found ${allDeliveries.length} deliveries in the system.`;
         rawData = allDeliveries;
         result = {
           type: 'list',
           items: allDeliveries.map(d => ({
-            'Delivery #': d.VBELN,
-            'Customer': d.CUSTOMER_NAME,
-            'Status': d.STATUS,
-            'Carrier': d.CARRIER || '-',
-            'Tracking': d.TRACKING_NUM || '-',
+            'Delivery #': d.vbeln,
+            'Customer': d.customer_name,
+            'Status': d.status,
+            'Carrier': d.carrier || '-',
+            'Tracking': d.tracking_num || '-',
           })),
         };
         break;
@@ -282,7 +298,7 @@ SELECT COUNT(*) as so_count, SUM(NETWR) as so_value FROM VBAK;
 
 -- Deliveries by Status
 SELECT STATUS, COUNT(*) FROM LIKP GROUP BY STATUS;`;
-        const stats = db.getDashboardStats();
+        const stats = await getDashboardStats();
         message = `Report: ${stats.purchaseOrders.total} POs ($${stats.purchaseOrders.totalValue?.toLocaleString()}), ${stats.salesOrders.total} SOs ($${stats.salesOrders.totalValue?.toLocaleString()})`;
         rawData = stats;
         result = {
@@ -298,16 +314,16 @@ SELECT STATUS, COUNT(*) FROM LIKP GROUP BY STATUS;`;
         // Try generic list queries
         if (query.toLowerCase().includes('vendor')) {
           sqlQuery = 'SELECT * FROM LFA1 ORDER BY NAME1';
-          const allVendors = db.getVendors();
+          const allVendors = await getVendors();
           message = `Found ${allVendors.length} vendors.`;
           rawData = allVendors;
           result = {
             type: 'list',
             items: allVendors.map(v => ({
-              'ID': v.LIFNR,
-              'Name': v.NAME1,
-              'City': v.ORT01,
-              'State': v.REGIO,
+              'ID': v.lifnr,
+              'Name': v.name1,
+              'City': v.ort01,
+              'State': v.regio,
             })),
           };
         } else if (query.toLowerCase().includes('material') || query.toLowerCase().includes('product')) {
@@ -316,30 +332,30 @@ FROM MARA m
 JOIN MAKT t ON m.MATNR = t.MATNR
 JOIN MARC c ON m.MATNR = c.MATNR
 JOIN MARD d ON m.MATNR = d.MATNR`;
-          const allMaterials = db.getMaterials();
+          const allMaterials = await getMaterials();
           message = `Found ${allMaterials.length} materials.`;
           rawData = allMaterials;
           result = {
             type: 'list',
             items: allMaterials.map(m => ({
-              'ID': m.MATNR,
-              'Description': m.MAKTX,
-              'Stock': m.LABST?.toLocaleString() || '0',
-              'Price': `$${m.STDPRICE?.toFixed(2) || '0.00'}`,
+              'ID': m.matnr,
+              'Description': m.maktx,
+              'Stock': m.labst?.toLocaleString() || '0',
+              'Price': `$${m.stdprice?.toFixed(2) || '0.00'}`,
             })),
           };
         } else if (query.toLowerCase().includes('customer')) {
           sqlQuery = 'SELECT * FROM KNA1 ORDER BY NAME1';
-          const allCustomers = db.getCustomers();
+          const allCustomers = await getCustomers();
           message = `Found ${allCustomers.length} customers.`;
           rawData = allCustomers;
           result = {
             type: 'list',
             items: allCustomers.map(c => ({
-              'ID': c.KUNNR,
-              'Name': c.NAME1,
-              'City': c.ORT01,
-              'Credit Limit': `$${c.CREDIT_LIMIT?.toLocaleString()}`,
+              'ID': c.kunnr,
+              'Name': c.name1,
+              'City': c.ort01,
+              'Credit Limit': `$${(c.credit_limit || 0).toLocaleString()}`,
             })),
           };
         } else {
@@ -427,35 +443,35 @@ SELECT new_vbeln, '000010',
 
 async function handleCreatePO(entities: Record<string, any>) {
   const vendorQuery = entities.vendor || '';
-  const vendors = db.searchVendors(vendorQuery);
+  const vendors = await searchVendors(vendorQuery);
   if (vendors.length === 0) {
     return { success: false, error: 'Vendor not found' };
   }
   const vendor = vendors[0];
 
   const materialQuery = entities.material || '';
-  const materials = db.searchMaterials(materialQuery);
+  const materials = await searchMaterials(materialQuery);
   if (materials.length === 0) {
     return { success: false, error: 'Material not found' };
   }
   const material = materials[0];
 
   const quantity = entities.quantity || 100;
-  const price = material.STDPRICE || 100;
+  const price = material.stdprice || 100;
 
-  const result = db.createPurchaseOrder(vendor.LIFNR, [
+  const result = await createPurchaseOrder(vendor.lifnr, [
     {
-      matnr: material.MATNR,
+      matnr: material.matnr,
       quantity,
       price,
-      description: material.MAKTX,
+      description: material.maktx || '',
     },
   ]);
 
   return {
     ...result,
-    vendor: vendor.NAME1,
-    material: material.MAKTX,
+    vendor: vendor.name1,
+    material: material.maktx,
     quantity,
     price,
     totalValue: quantity * price,
@@ -464,14 +480,14 @@ async function handleCreatePO(entities: Record<string, any>) {
 
 async function handleCreateSO(entities: Record<string, any>) {
   const customerQuery = entities.customer || '';
-  const customers = db.searchCustomers(customerQuery);
+  const customers = await searchCustomers(customerQuery);
   if (customers.length === 0) {
     return { success: false, error: 'Customer not found' };
   }
   const customer = customers[0];
 
   const materialQuery = entities.material || '';
-  const materials = db.searchMaterials(materialQuery);
+  const materials = await searchMaterials(materialQuery);
   if (materials.length === 0) {
     return { success: false, error: 'Material not found' };
   }
@@ -480,26 +496,26 @@ async function handleCreateSO(entities: Record<string, any>) {
   const quantity = entities.quantity || 50;
   const customerPO = `CUST-${Date.now()}`;
 
-  const result = db.createSalesOrder(customer.KUNNR, customerPO, [
+  const result = await createSalesOrder(customer.kunnr, customerPO, [
     {
-      matnr: material.MATNR,
+      matnr: material.matnr,
       quantity,
-      description: material.MAKTX,
+      description: material.maktx || '',
     },
   ]);
 
   return {
     ...result,
-    customer: customer.NAME1,
-    material: material.MAKTX,
+    customer: customer.name1,
+    material: material.maktx,
     quantity,
-    totalValue: quantity * (material.STDPRICE || 100),
+    totalValue: quantity * (material.stdprice || 100),
   };
 }
 
 async function handleCheckStock(entities: Record<string, any>) {
   const materialQuery = entities.material || '';
-  const materials = db.searchMaterials(materialQuery);
+  const materials = await searchMaterials(materialQuery);
 
   if (materials.length === 0) {
     return {
@@ -512,13 +528,13 @@ async function handleCheckStock(entities: Record<string, any>) {
 
   const material = materials[0];
   const quantity = entities.quantity || 1;
-  const availability = db.checkMaterialAvailability(material.MATNR, quantity);
+  const availability = await checkMaterialAvailability(material.matnr, quantity);
 
   return {
-    material: material.MAKTX,
-    materialId: material.MATNR,
+    material: material.maktx,
+    materialId: material.matnr,
     stock: availability.stock,
-    unit: material.MEINS,
+    unit: material.meins,
     requestedQty: quantity,
     available: availability.available,
   };
@@ -526,26 +542,34 @@ async function handleCheckStock(entities: Record<string, any>) {
 
 async function handleTrackShipment(entities: Record<string, any>) {
   const trackingId = entities.trackingId || '';
-  const delivery = db.getDeliveryByTracking(trackingId);
+  const delivery = await getDeliveryByTracking(trackingId);
 
   if (!delivery) return null;
 
   return {
-    vbeln: delivery.VBELN,
-    status: delivery.STATUS,
-    tracking: delivery.TRACKING_NUM,
-    carrier: delivery.CARRIER,
-    customer: delivery.CUSTOMER_NAME,
-    deliveryDate: formatDate(delivery.LFDAT),
+    vbeln: delivery.vbeln,
+    status: delivery.status,
+    tracking: delivery.tracking_num,
+    carrier: delivery.carrier,
+    customer: delivery.customer_name,
+    deliveryDate: formatDate(delivery.lfdat),
   };
 }
 
 async function handleInvoiceStatus(entities: Record<string, any>) {
   const invoiceRef = entities.invoiceRef || '';
-  return db.getInvoicePaymentStatus(invoiceRef);
+  return await getInvoicePaymentStatus(invoiceRef);
 }
 
-function formatDate(dateStr: string): string {
-  if (!dateStr || dateStr.length !== 8) return dateStr;
-  return `${dateStr.substring(0, 4)}-${dateStr.substring(4, 6)}-${dateStr.substring(6, 8)}`;
+function formatDate(dateStr: string | undefined): string {
+  if (!dateStr) return '';
+  // Handle ISO date format from Supabase
+  if (dateStr.includes('-')) {
+    return dateStr.split('T')[0];
+  }
+  // Handle YYYYMMDD format
+  if (dateStr.length === 8) {
+    return `${dateStr.substring(0, 4)}-${dateStr.substring(4, 6)}-${dateStr.substring(6, 8)}`;
+  }
+  return dateStr;
 }
