@@ -205,8 +205,10 @@ const intentPatterns: Array<{
   // Daily Report
   {
     patterns: [
-      /(?:generate|show|get)\s+(?:the\s+)?(?:daily|today'?s?)\s+(?:report|summary)/i,
+      /(?:generate|show|get)\s+(?:the\s+)?(?:today'?s?\s+)?(?:daily\s+)?(?:report|summary)/i,
+      /(?:generate|show|get)\s+(?:the\s+)?daily\s+(?:report|summary)/i,
       /(?:what happened|summary)\s+(?:today|yesterday)/i,
+      /daily\s+report/i,
     ],
     intent: 'GENERATE_DAILY_REPORT',
     extractors: {},
