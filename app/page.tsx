@@ -507,46 +507,46 @@ export default function Home() {
                   title="LFA1 - Vendor Master"
                   icon={Building2}
                   data={sapData.vendors}
-                  columns={['LIFNR', 'NAME1', 'ORT01', 'REGIO']}
+                  columns={['lifnr', 'name1', 'ort01', 'regio']}
                   labels={['Vendor ID', 'Name', 'City', 'State']}
                 />
                 <DataTable
                   title="KNA1 - Customer Master"
                   icon={Users}
                   data={sapData.customers}
-                  columns={['KUNNR', 'NAME1', 'ORT01', 'CREDIT_LIMIT']}
+                  columns={['kunnr', 'name1', 'ort01', 'credit_limit']}
                   labels={['Customer ID', 'Name', 'City', 'Credit Limit']}
-                  formatters={{ CREDIT_LIMIT: (v: number) => `$${v?.toLocaleString()}` }}
+                  formatters={{ credit_limit: (v: number) => `$${v?.toLocaleString()}` }}
                 />
                 <DataTable
                   title="MARA/MAKT - Materials"
                   icon={Package}
                   data={sapData.materials}
-                  columns={['MATNR', 'MAKTX', 'LABST', 'STDPRICE']}
+                  columns={['matnr', 'maktx', 'labst', 'stdprice']}
                   labels={['Material ID', 'Description', 'Stock', 'Price']}
-                  formatters={{ STDPRICE: (v: number) => `$${v?.toFixed(2)}`, LABST: (v: number) => v?.toLocaleString() }}
+                  formatters={{ stdprice: (v: number) => `$${v?.toFixed(2)}`, labst: (v: number) => v?.toLocaleString() }}
                 />
                 <DataTable
                   title="EKKO/EKPO - Purchase Orders"
                   icon={ShoppingCart}
                   data={sapData.purchaseOrders}
-                  columns={['EBELN', 'VENDOR_NAME', 'BEDAT', 'NETWR']}
+                  columns={['ebeln', 'vendor_name', 'bedat', 'netwr']}
                   labels={['PO Number', 'Vendor', 'Date', 'Value']}
-                  formatters={{ NETWR: (v: number) => `$${v?.toLocaleString()}`, BEDAT: formatSAPDate }}
+                  formatters={{ netwr: (v: number) => `$${v?.toLocaleString()}`, bedat: formatSAPDate }}
                 />
                 <DataTable
                   title="VBAK/VBAP - Sales Orders"
                   icon={FileText}
                   data={sapData.salesOrders}
-                  columns={['VBELN', 'CUSTOMER_NAME', 'ERDAT', 'NETWR']}
+                  columns={['vbeln', 'customer_name', 'erdat', 'netwr']}
                   labels={['SO Number', 'Customer', 'Date', 'Value']}
-                  formatters={{ NETWR: (v: number) => `$${v?.toLocaleString()}`, ERDAT: formatSAPDate }}
+                  formatters={{ netwr: (v: number) => `$${v?.toLocaleString()}`, erdat: formatSAPDate }}
                 />
                 <DataTable
                   title="LIKP - Deliveries"
                   icon={Truck}
                   data={sapData.deliveries}
-                  columns={['VBELN', 'CUSTOMER_NAME', 'STATUS', 'CARRIER']}
+                  columns={['vbeln', 'customer_name', 'status', 'carrier']}
                   labels={['Delivery #', 'Customer', 'Status', 'Carrier']}
                 />
               </div>
