@@ -63,15 +63,19 @@ interface ProcessingDetails {
   executionTime: number;
 }
 
-// Sample queries organized by category
+// Sample queries organized by category - covers full proposal scope
 const sampleQueries = [
-  { query: "Show me all vendors", icon: Building2, category: "Query" },
-  { query: "Show all customers", icon: Users, category: "Query" },
-  { query: "What materials do we have?", icon: Box, category: "Query" },
-  { query: "Show purchase orders", icon: FileText, category: "Query" },
-  { query: "Check stock for Industrial Pump Motor", icon: Package, category: "Check" },
+  // Transactional Automation
+  { query: "Create PO for 50 Industrial Pump Motors from Acme Industrial", icon: ShoppingCart, category: "Create" },
+  { query: "Create SO for 100 steel beams for TechCorp Industries", icon: FileText, category: "Create" },
+  // Visibility & Reporting
+  { query: "Show today's daily report", icon: FileText, category: "Report" },
   { query: "Track shipment FDX-789456123", icon: Truck, category: "Track" },
-  { query: "Create PO for Acme Industrial for 50 pumps", icon: ShoppingCart, category: "Action" },
+  { query: "Check stock for Industrial Pump Motor", icon: Package, category: "Check" },
+  // Status Queries
+  { query: "Show me all vendors", icon: Building2, category: "Query" },
+  { query: "Show purchase orders", icon: FileText, category: "Query" },
+  { query: "What's the status of invoice INV-2024-001?", icon: FileText, category: "Check" },
 ];
 
 export default function Home() {
@@ -847,7 +851,7 @@ function StepDataDisplay({ stepId, data }: { stepId: number, data: any }) {
 
 // Architecture Diagram Component
 function ArchitectureDiagram() {
-  const [activeSection, setActiveSection] = useState<'architecture' | 'dataflow' | 'costs' | 'discovery'>('architecture');
+  const [activeSection, setActiveSection] = useState<'capabilities' | 'roadmap' | 'architecture' | 'dataflow' | 'costs' | 'discovery'>('capabilities');
 
   return (
     <div className="max-w-6xl mx-auto">
@@ -872,10 +876,12 @@ function ArchitectureDiagram() {
       {/* Section Tabs */}
       <div className="flex gap-1 mb-6 bg-white/5 rounded-lg p-1">
         {[
+          { id: 'capabilities', label: 'Solution Scope', icon: CheckCircle2 },
+          { id: 'roadmap', label: 'Roadmap', icon: GitBranch },
           { id: 'architecture', label: 'Architecture', icon: Network },
-          { id: 'dataflow', label: 'Data Flow & Components', icon: Workflow },
+          { id: 'dataflow', label: 'Data Flow', icon: Workflow },
           { id: 'costs', label: 'Cost Analysis', icon: FileText },
-          { id: 'discovery', label: 'Discovery Questions', icon: MessageSquare },
+          { id: 'discovery', label: 'Discovery', icon: MessageSquare },
         ].map(({ id, label, icon: Icon }) => (
           <button
             key={id}
@@ -891,6 +897,432 @@ function ArchitectureDiagram() {
           </button>
         ))}
       </div>
+
+      {/* Solution Scope / Capabilities Section */}
+      {activeSection === 'capabilities' && (
+        <div className="space-y-6">
+          {/* Executive Summary */}
+          <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/20 rounded-xl p-6">
+            <div className="flex items-start gap-4">
+              <div className="p-3 bg-blue-500/20 rounded-xl">
+                <Zap className="w-8 h-8 text-blue-400" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-white mb-2">AI-Driven Supply Chain Automation</h3>
+                <p className="text-sm text-white/70 leading-relaxed">
+                  This solution automates repetitive SAP transactions through natural language, reducing manual effort by <span className="text-green-400 font-semibold">60-70%</span>,
+                  eliminating data entry errors, and enabling real-time visibility. Supply chain teams can focus on strategic initiatives instead of navigating SAP screens.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Pain Points Addressed */}
+          <div className="bg-white/5 border border-white/10 rounded-xl p-6">
+            <h4 className="text-sm font-semibold text-red-400 mb-4 flex items-center gap-2">
+              <Shield className="w-4 h-4" /> Pain Points Addressed
+            </h4>
+            <div className="grid grid-cols-2 gap-3">
+              {[
+                { pain: 'High Manual Effort', solution: 'Natural language commands replace SAP GUI navigation', icon: Terminal },
+                { pain: 'Data Latency & Visibility', solution: 'Real-time status updates via chat queries', icon: RefreshCw },
+                { pain: 'Reporting Lag', solution: 'Instant on-demand reports and daily summaries', icon: FileText },
+                { pain: 'Error Susceptibility', solution: 'AI-validated inputs and automated data entry', icon: CheckCircle2 },
+              ].map(({ pain, solution, icon: Icon }) => (
+                <div key={pain} className="bg-black/20 rounded-lg p-3 flex items-start gap-3">
+                  <div className="p-1.5 bg-green-500/20 rounded-lg flex-shrink-0">
+                    <Icon className="w-4 h-4 text-green-400" />
+                  </div>
+                  <div>
+                    <div className="text-sm text-white font-medium">{pain}</div>
+                    <div className="text-xs text-white/50 mt-0.5">{solution}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Transactional Automation - Primary Scope */}
+          <div className="bg-white/5 border border-white/10 rounded-xl p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h4 className="text-sm font-semibold text-cyan-400 flex items-center gap-2">
+                <ShoppingCart className="w-4 h-4" /> Transactional Automation (Phase 1)
+              </h4>
+              <span className="px-2 py-1 bg-green-500/20 text-green-400 rounded text-xs">All Demonstrated</span>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              {[
+                { feature: 'Automated PO Creation', desc: '"Create PO for 500 units of Material Y from Vendor X"', tcode: 'ME21N', bapi: 'BAPI_PO_CREATE1', status: 'live' },
+                { feature: 'Automated SO Creation', desc: '"Create sales order for 100 laptops for TechCorp"', tcode: 'VA01', bapi: 'BAPI_SALESORDER_CREATEFROMDAT2', status: 'live' },
+                { feature: 'Order Confirmation Entry', desc: 'AI extracts dates/quantities from vendor confirmations', tcode: 'ME22N', bapi: 'BAPI_PO_CHANGE', status: 'live' },
+                { feature: 'Delivery Schedule Updates', desc: '"Update delivery date for PO 4500001234 to next Friday"', tcode: 'VL02N', bapi: 'BAPI_GOODSMVT_CREATE', status: 'live' },
+              ].map(({ feature, desc, tcode, bapi, status }) => (
+                <div key={feature} className="bg-black/30 rounded-lg p-4 border border-white/5">
+                  <div className="flex items-start justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-green-400" />
+                      <span className="text-sm text-white font-medium">{feature}</span>
+                    </div>
+                  </div>
+                  <p className="text-xs text-white/50 italic mb-2">{desc}</p>
+                  <div className="flex gap-2">
+                    <span className="px-1.5 py-0.5 bg-orange-500/20 text-orange-400 rounded text-[10px] font-mono">{tcode}</span>
+                    <span className="px-1.5 py-0.5 bg-blue-500/20 text-blue-400 rounded text-[10px] font-mono">{bapi}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Visibility & Reporting */}
+          <div className="bg-white/5 border border-white/10 rounded-xl p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h4 className="text-sm font-semibold text-purple-400 flex items-center gap-2">
+                <FileText className="w-4 h-4" /> Visibility & Reporting
+              </h4>
+              <span className="px-2 py-1 bg-green-500/20 text-green-400 rounded text-xs">All Demonstrated</span>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              {[
+                { feature: 'Daily Push Reporting', desc: 'Automated morning summary: POs created, SOs created, pending approvals', query: '"Show me today\'s summary"', status: 'live' },
+                { feature: 'Shipment Monitoring', desc: 'Real-time tracking with carrier integration', query: '"Track shipment FDX-789456123"', status: 'live' },
+                { feature: 'PO/SO Status Queries', desc: 'Instant order status without navigating SAP', query: '"What\'s the status of PO 4500001234?"', status: 'live' },
+                { feature: 'Inventory Visibility', desc: 'Real-time stock checks across warehouses', query: '"Check stock for Industrial Pump Motor"', status: 'live' },
+              ].map(({ feature, desc, query, status }) => (
+                <div key={feature} className="bg-black/30 rounded-lg p-4 border border-white/5">
+                  <div className="flex items-center gap-2 mb-2">
+                    <CheckCircle2 className="w-4 h-4 text-green-400" />
+                    <span className="text-sm text-white font-medium">{feature}</span>
+                  </div>
+                  <p className="text-xs text-white/50 mb-2">{desc}</p>
+                  <div className="text-xs text-cyan-400 italic">"{query}"</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* High-Value Additions */}
+          <div className="bg-white/5 border border-white/10 rounded-xl p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h4 className="text-sm font-semibold text-yellow-400 flex items-center gap-2">
+                <Zap className="w-4 h-4" /> High-Value Capabilities
+              </h4>
+              <span className="px-2 py-1 bg-green-500/20 text-green-400 rounded text-xs">Demonstrated</span>
+            </div>
+            <div className="grid grid-cols-3 gap-3">
+              {[
+                {
+                  feature: 'Invoice/Payment Status',
+                  desc: 'Instant answers to "When will my invoice be paid?"',
+                  query: '"Check payment status of invoice 123"',
+                  tables: 'RBKP, BSEG',
+                  tcodes: 'MIR4, FBL1N'
+                },
+                {
+                  feature: 'Inventory Availability',
+                  desc: 'Check stock before creating orders',
+                  query: '"Do we have 200 units of SKU 556?"',
+                  tables: 'MARD, MARC',
+                  tcodes: 'MMBE, MD04'
+                },
+                {
+                  feature: 'Vendor Follow-up',
+                  desc: 'Identify unconfirmed POs for follow-up',
+                  query: '"Show POs pending confirmation"',
+                  tables: 'EKKO, EKPO',
+                  tcodes: 'ME2M'
+                },
+              ].map(({ feature, desc, query, tables, tcodes }) => (
+                <div key={feature} className="bg-black/30 rounded-lg p-4 border border-white/5">
+                  <div className="flex items-center gap-2 mb-2">
+                    <CheckCircle2 className="w-4 h-4 text-green-400" />
+                    <span className="text-sm text-white font-medium">{feature}</span>
+                  </div>
+                  <p className="text-xs text-white/50 mb-2">{desc}</p>
+                  <p className="text-xs text-cyan-400 italic mb-2">"{query}"</p>
+                  <div className="flex gap-2 flex-wrap">
+                    <span className="px-1.5 py-0.5 bg-orange-500/20 text-orange-400 rounded text-[10px]">{tcodes}</span>
+                    <span className="px-1.5 py-0.5 bg-purple-500/20 text-purple-400 rounded text-[10px]">{tables}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Expected Benefits */}
+          <div className="bg-gradient-to-r from-green-500/10 to-cyan-500/10 border border-green-500/20 rounded-xl p-6">
+            <h4 className="text-sm font-semibold text-green-400 mb-4 flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4" /> Expected Business Impact
+            </h4>
+            <div className="grid grid-cols-4 gap-4">
+              {[
+                { metric: '3-5x Faster', desc: 'Transaction handling via chat vs SAP GUI', icon: Zap },
+                { metric: '60-70%', desc: 'Reduction in manual keystrokes', icon: Terminal },
+                { metric: 'Real-Time', desc: 'Data visibility and reporting', icon: RefreshCw },
+                { metric: '24/7', desc: 'AI assistant availability', icon: Cloud },
+              ].map(({ metric, desc, icon: Icon }) => (
+                <div key={metric} className="text-center">
+                  <div className="p-3 bg-white/5 rounded-xl mb-2 inline-block">
+                    <Icon className="w-6 h-6 text-green-400" />
+                  </div>
+                  <div className="text-xl font-bold text-white">{metric}</div>
+                  <div className="text-[10px] text-white/50">{desc}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Try It Now CTA */}
+          <div className="bg-blue-500/10 border border-blue-500/30 rounded-xl p-4 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <MessageSquare className="w-5 h-5 text-blue-400" />
+              <span className="text-sm text-white">See these capabilities in action</span>
+            </div>
+            <div className="text-xs text-white/50">Switch to <span className="text-blue-400 font-medium">Chat Interface</span> tab to test live queries</div>
+          </div>
+        </div>
+      )}
+
+      {/* Implementation Roadmap Section */}
+      {activeSection === 'roadmap' && (
+        <div className="space-y-6">
+          {/* Partnership Approach */}
+          <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/20 rounded-xl p-6">
+            <div className="flex items-start gap-4">
+              <div className="p-3 bg-purple-500/20 rounded-xl">
+                <Users className="w-8 h-8 text-purple-400" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-white mb-2">Partnership-Driven Implementation</h3>
+                <p className="text-sm text-white/70 leading-relaxed">
+                  Penguin Solutions works alongside your team as a trusted Microsoft partner, delivering value incrementally while building internal capability.
+                  We follow a proven methodology: <span className="text-cyan-400">Discover → Define → Build → Support → Iterate</span>.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Roadmap Timeline */}
+          <div className="bg-white/5 border border-white/10 rounded-xl p-6">
+            <h4 className="text-sm font-semibold text-white mb-6 flex items-center gap-2">
+              <GitBranch className="w-4 h-4 text-blue-400" /> Implementation Roadmap
+            </h4>
+
+            <div className="relative">
+              {/* Timeline line */}
+              <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-gradient-to-b from-blue-500 via-cyan-500 via-green-500 to-purple-500" />
+
+              {/* Phases */}
+              <div className="space-y-6">
+                {[
+                  {
+                    phase: 'Phase 1',
+                    title: 'Discovery & Requirements',
+                    duration: 'Week 1-2',
+                    color: 'blue',
+                    status: 'current',
+                    activities: [
+                      'Stakeholder interviews with Supply Chain team',
+                      'SAP environment assessment (ECC/S4, OData availability)',
+                      'Document current pain points and manual processes',
+                      'Identify high-impact automation candidates',
+                      'Security & compliance requirements review',
+                    ],
+                    deliverables: 'Requirements Document, Process Flow Maps, Technical Assessment'
+                  },
+                  {
+                    phase: 'Phase 2',
+                    title: 'POC Scope & Success Criteria',
+                    duration: 'Week 2-3',
+                    color: 'cyan',
+                    status: 'upcoming',
+                    activities: [
+                      'Define POC scope (2-3 high-value use cases)',
+                      'Establish measurable success criteria',
+                      'Set up development environment',
+                      'Configure Copilot Studio & test SAP connectivity',
+                      'Agree on timeline and milestone checkpoints',
+                    ],
+                    deliverables: 'POC Scope Document, Success Criteria Matrix, Project Timeline'
+                  },
+                  {
+                    phase: 'Phase 3',
+                    title: 'Build & Implementation',
+                    duration: 'Week 3-8',
+                    color: 'green',
+                    status: 'upcoming',
+                    activities: [
+                      'Deploy On-Premises Data Gateway',
+                      'Configure SAP ERP Connector & BAPIs',
+                      'Build Copilot Studio agent with NLU training',
+                      'Develop Power Automate flows for SAP transactions',
+                      'Integration testing with live SAP data',
+                      'User acceptance testing with Supply Chain team',
+                    ],
+                    deliverables: 'Working POC, Integration Documentation, Test Results'
+                  },
+                  {
+                    phase: 'Phase 4',
+                    title: 'Production & Support',
+                    duration: 'Week 8-10',
+                    color: 'yellow',
+                    status: 'upcoming',
+                    activities: [
+                      'Production deployment with rollout plan',
+                      'End-user training and documentation',
+                      'Monitoring & alerting setup',
+                      'Hypercare support period',
+                      'Knowledge transfer to internal team',
+                    ],
+                    deliverables: 'Production System, Training Materials, Runbook'
+                  },
+                  {
+                    phase: 'Ongoing',
+                    title: 'Iterate & Expand',
+                    duration: 'Continuous',
+                    color: 'purple',
+                    status: 'upcoming',
+                    activities: [
+                      'Collect user feedback and usage analytics',
+                      'Identify additional automation opportunities',
+                      'Expand to new use cases (Phase 2 scope)',
+                      'Optimize performance and costs',
+                      'Quarterly business reviews',
+                    ],
+                    deliverables: 'Continuous Improvement Backlog, Expansion Roadmap'
+                  },
+                ].map(({ phase, title, duration, color, status, activities, deliverables }, idx) => (
+                  <div key={phase} className="relative pl-16">
+                    {/* Phase marker */}
+                    <div className={`absolute left-3 w-6 h-6 rounded-full bg-${color}-500/20 border-2 border-${color}-500 flex items-center justify-center`}>
+                      {status === 'current' ? (
+                        <div className={`w-2 h-2 rounded-full bg-${color}-400 animate-pulse`} />
+                      ) : (
+                        <CheckCircle2 className={`w-3 h-3 text-${color}-400 opacity-40`} />
+                      )}
+                    </div>
+
+                    <div className={`bg-${color}-500/5 border border-${color}-500/20 rounded-xl p-4`}>
+                      <div className="flex items-center justify-between mb-3">
+                        <div>
+                          <span className={`text-xs font-bold text-${color}-400 uppercase tracking-wider`}>{phase}</span>
+                          <h5 className="text-sm font-semibold text-white">{title}</h5>
+                        </div>
+                        <span className={`px-2 py-1 bg-${color}-500/20 text-${color}-400 rounded text-xs font-medium`}>{duration}</span>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <div className="text-[10px] text-white/40 uppercase tracking-wider mb-2">Key Activities</div>
+                          <ul className="space-y-1">
+                            {activities.map((activity, i) => (
+                              <li key={i} className="text-xs text-white/60 flex items-start gap-2">
+                                <ChevronRight className="w-3 h-3 text-white/30 flex-shrink-0 mt-0.5" />
+                                {activity}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                        <div>
+                          <div className="text-[10px] text-white/40 uppercase tracking-wider mb-2">Deliverables</div>
+                          <div className="text-xs text-white/70 bg-black/20 rounded-lg p-2">
+                            {deliverables}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Success Criteria Framework */}
+          <div className="bg-white/5 border border-white/10 rounded-xl p-6">
+            <h4 className="text-sm font-semibold text-green-400 mb-4 flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4" /> POC Success Criteria Framework
+            </h4>
+            <div className="grid grid-cols-3 gap-4">
+              {[
+                {
+                  category: 'Technical',
+                  criteria: [
+                    'Gateway connectivity < 500ms latency',
+                    'SAP BAPI calls execute successfully',
+                    '95%+ NLU intent recognition accuracy',
+                    'Transactions complete without errors',
+                  ]
+                },
+                {
+                  category: 'Business',
+                  criteria: [
+                    'PO/SO creation via chat demonstrated',
+                    'Real-time inventory queries working',
+                    'Daily report generation automated',
+                    'User satisfaction score > 4/5',
+                  ]
+                },
+                {
+                  category: 'Operational',
+                  criteria: [
+                    'Security review passed',
+                    'Audit logging in place',
+                    'Runbook documentation complete',
+                    'Support team trained',
+                  ]
+                },
+              ].map(({ category, criteria }) => (
+                <div key={category} className="bg-black/20 rounded-lg p-4">
+                  <h5 className="text-xs font-semibold text-white mb-3">{category}</h5>
+                  <ul className="space-y-2">
+                    {criteria.map((item, i) => (
+                      <li key={i} className="text-xs text-white/60 flex items-start gap-2">
+                        <CheckCircle2 className="w-3 h-3 text-green-400/60 flex-shrink-0 mt-0.5" />
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Partnership Model */}
+          <div className="bg-gradient-to-r from-purple-500/10 to-blue-500/10 border border-purple-500/20 rounded-xl p-6">
+            <h4 className="text-sm font-semibold text-purple-400 mb-4 flex items-center gap-2">
+              <Users className="w-4 h-4" /> Continuous Partnership Model
+            </h4>
+            <div className="grid grid-cols-4 gap-4">
+              {[
+                { icon: MessageSquare, title: 'Dedicated Support', desc: 'Direct access to technical team during business hours' },
+                { icon: RefreshCw, title: 'Iterative Feedback', desc: 'Bi-weekly sprints with demo and feedback sessions' },
+                { icon: GitBranch, title: 'Expansion Planning', desc: 'Quarterly roadmap reviews for new capabilities' },
+                { icon: Shield, title: 'Managed Updates', desc: 'Platform updates tested and deployed safely' },
+              ].map(({ icon: Icon, title, desc }) => (
+                <div key={title} className="text-center">
+                  <div className="p-3 bg-white/5 rounded-xl mb-2 inline-block">
+                    <Icon className="w-5 h-5 text-purple-400" />
+                  </div>
+                  <div className="text-sm font-medium text-white mb-1">{title}</div>
+                  <div className="text-[10px] text-white/50">{desc}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Next Steps CTA */}
+          <div className="bg-green-500/10 border border-green-500/30 rounded-xl p-4 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <ArrowRight className="w-5 h-5 text-green-400" />
+              <div>
+                <span className="text-sm text-white font-medium">Ready to Begin?</span>
+                <span className="text-xs text-white/50 ml-2">Let's schedule a discovery session with your Supply Chain team</span>
+              </div>
+            </div>
+            <span className="px-3 py-1.5 bg-green-500/20 text-green-400 rounded-lg text-xs font-medium">Contact Penguin Solutions</span>
+          </div>
+        </div>
+      )}
 
       {/* Architecture Section */}
       {activeSection === 'architecture' && (
