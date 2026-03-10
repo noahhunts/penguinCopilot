@@ -122,21 +122,21 @@ export default function Home() {
       { id: 2, title: 'Azure OpenAI Processing', status: 'pending', data: null },
       { id: 3, title: 'Intent Classification', status: 'pending', data: null },
       { id: 4, title: 'Entity Extraction', status: 'pending', data: null },
-      { id: 5, title: 'BAPI/RFC Mapping', status: 'pending', data: null },
+      { id: 5, title: 'OData/RFC Mapping', status: 'pending', data: null },
       { id: 6, title: 'SAP System Execution', status: 'pending', data: null },
       { id: 7, title: 'Response Generation', status: 'pending', data: null },
     ];
     setPipelineSteps([...steps]);
 
     // Step 1: User Input
-    await delay(300);
+    await delay(150);
     steps[0].status = 'complete';
     steps[1].status = 'active';
     steps[1].data = 'Sending query to Azure OpenAI GPT-4 Turbo...';
     setPipelineSteps([...steps]);
 
     // Step 2: Azure OpenAI
-    await delay(500);
+    await delay(250);
     steps[1].status = 'complete';
     steps[1].data = 'Model: gpt-4-turbo | Tokens: ~150 | Latency: 280ms';
     steps[2].status = 'active';
@@ -172,25 +172,26 @@ export default function Home() {
     };
     steps[3].status = 'active';
     setPipelineSteps([...steps]);
-    await delay(300);
+    await delay(150);
 
     // Step 4: Entity Extraction
     steps[3].status = 'complete';
     steps[3].data = processingDetails.entities;
     steps[4].status = 'active';
     setPipelineSteps([...steps]);
-    await delay(400);
+    await delay(200);
 
-    // Step 5: BAPI Mapping
+    // Step 5: OData/RFC Mapping
     steps[4].status = 'complete';
     steps[4].data = {
+      route: 'OData (primary) / RFC (fallback)',
       bapi: processingDetails.bapiCall,
       tables: processingDetails.sapTables,
       tcodes: processingDetails.tcodes,
     };
     steps[5].status = 'active';
     setPipelineSteps([...steps]);
-    await delay(500);
+    await delay(250);
 
     // Step 6: SAP Execution
     steps[5].status = 'complete';
@@ -200,7 +201,7 @@ export default function Home() {
     };
     steps[6].status = 'active';
     setPipelineSteps([...steps]);
-    await delay(300);
+    await delay(150);
 
     // Step 7: Complete
     steps[6].status = 'complete';
@@ -224,6 +225,10 @@ export default function Home() {
     setMessages(prev => [...prev, assistantMessage]);
     setIsProcessing(false);
     loadSAPData();
+
+    // Auto-navigate back to chat after brief pause to show completion
+    await delay(800);
+    setActiveTab('chat');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -304,6 +309,20 @@ export default function Home() {
         </div>
       </header>
 
+      {/* Teams Demo Disclaimer */}
+      <div className="bg-gradient-to-r from-[#464775]/30 via-[#5b5fc7]/20 to-[#464775]/30 border-b border-[#5b5fc7]/30 px-6 py-2">
+        <div className="flex items-center justify-center gap-2">
+          <svg className="w-4 h-4 text-[#7b83eb] flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M20.625 10.75h-3.125v-3c0-.69-.56-1.25-1.25-1.25h-1.5V3.375A1.875 1.875 0 0 0 12.875 1.5h-3.75A1.875 1.875 0 0 0 7.25 3.375V6.5h-1.5c-.69 0-1.25.56-1.25 1.25v3H1.375A1.375 1.375 0 0 0 0 12.125v5.5A1.375 1.375 0 0 0 1.375 19H4.5v1.5c0 .69.56 1.25 1.25 1.25h12.5c.69 0 1.25-.56 1.25-1.25V19h1.125A1.375 1.375 0 0 0 22 17.625v-5.5a1.375 1.375 0 0 0-1.375-1.375z"/>
+          </svg>
+          <p className="text-xs text-white/70">
+            <span className="text-[#7b83eb] font-semibold">Microsoft Teams Integration</span>
+            <span className="mx-1.5 text-white/30">|</span>
+            In production, this SAP Copilot experience lives natively inside Microsoft Teams. This is a standalone demo environment showcasing the full capabilities.
+          </p>
+        </div>
+      </div>
+
       {/* Tab Navigation */}
       <div className="bg-[#12121f] border-b border-white/10 px-6">
         <div className="flex gap-1">
@@ -311,7 +330,7 @@ export default function Home() {
             { id: 'chat', label: 'Chat Interface', icon: MessageSquare },
             { id: 'data', label: 'Live SAP Data', icon: Database },
             { id: 'pipeline', label: 'Processing Pipeline', icon: Layers },
-            { id: 'architecture', label: 'Architecture', icon: GitBranch },
+            { id: 'architecture', label: 'Solution Overview', icon: GitBranch },
           ].map((tab) => (
             <button
               key={tab.id}
@@ -597,7 +616,7 @@ function EnhancedPipelineVisualization({ steps, isProcessing }: { steps: Pipelin
     { id: 2, title: 'Azure OpenAI Processing', status: 'pending', data: null },
     { id: 3, title: 'Intent Classification', status: 'pending', data: null },
     { id: 4, title: 'Entity Extraction', status: 'pending', data: null },
-    { id: 5, title: 'BAPI/RFC Mapping', status: 'pending', data: null },
+    { id: 5, title: 'OData/RFC Mapping', status: 'pending', data: null },
     { id: 6, title: 'SAP System Execution', status: 'pending', data: null },
     { id: 7, title: 'Response Generation', status: 'pending', data: null },
   ];
@@ -611,8 +630,8 @@ function EnhancedPipelineVisualization({ steps, isProcessing }: { steps: Pipelin
     'GPT-4 Turbo processes and understands the query',
     'AI determines the user\'s intent (e.g., LIST_VENDORS, CREATE_PO)',
     'Extracts key entities (vendor names, quantities, dates)',
-    'Maps intent to appropriate SAP BAPI/RFC function',
-    'Executes SQL queries against SAP database tables',
+    'Maps intent to SAP OData service or BAPI/RFC function call',
+    'Executes via OData REST API or RFC against SAP system',
     'Formats and returns results to user',
   ];
 
@@ -852,7 +871,7 @@ function StepDataDisplay({ stepId, data }: { stepId: number, data: any }) {
 
 // Architecture Diagram Component
 function ArchitectureDiagram() {
-  const [activeSection, setActiveSection] = useState<'capabilities' | 'roadmap' | 'architecture' | 'dataflow' | 'costs' | 'discovery'>('capabilities');
+  const [activeSection, setActiveSection] = useState<'capabilities' | 'roadmap' | 'dataflow' | 'costs' | 'discovery'>('capabilities');
 
   return (
     <div className="max-w-6xl mx-auto">
@@ -863,7 +882,7 @@ function ArchitectureDiagram() {
             <GitBranch className="w-6 h-6 text-blue-400" />
           </div>
           <div>
-            <h2 className="text-xl font-bold text-white">Microsoft Copilot + SAP Integration Architecture</h2>
+            <h2 className="text-xl font-bold text-white">Microsoft Copilot + SAP Integration Solution</h2>
             <p className="text-sm text-white/50">Enterprise-grade solution leveraging Microsoft 365 ecosystem</p>
           </div>
         </div>
@@ -879,7 +898,6 @@ function ArchitectureDiagram() {
         {[
           { id: 'capabilities', label: 'Solution Scope', icon: CheckCircle2 },
           { id: 'roadmap', label: 'Roadmap', icon: GitBranch },
-          { id: 'architecture', label: 'Architecture', icon: Network },
           { id: 'dataflow', label: 'Data Flow', icon: Workflow },
           { id: 'costs', label: 'Cost Analysis', icon: FileText },
           { id: 'discovery', label: 'Discovery', icon: MessageSquare },
@@ -1325,124 +1343,42 @@ function ArchitectureDiagram() {
         </div>
       )}
 
-      {/* Architecture Section */}
-      {activeSection === 'architecture' && (
-        <div className="space-y-6">
-          {/* Main Architecture Diagram */}
-          <div className="bg-[#12121f] border border-white/10 rounded-xl p-6">
-            <div className="text-center mb-6">
-              <span className="px-3 py-1 bg-blue-500/20 text-blue-400 rounded-full text-xs font-medium">
-                Microsoft Copilot Studio + Power Platform + SAP Integration
-              </span>
-            </div>
-
-            <div className="grid grid-cols-5 gap-4 items-start">
-              {/* User Layer */}
-              <div className="space-y-3">
-                <div className="text-xs text-white/40 text-center font-medium uppercase tracking-wider">User Layer</div>
-                <ArchBox icon={Users} label="End Users" sublabel="Microsoft Teams" color="purple" />
-                <Arrow />
-                <ArchBox icon={MessageSquare} label="Microsoft 365 Copilot" sublabel="$30/user/month" color="purple" />
-              </div>
-
-              {/* AI Layer */}
-              <div className="space-y-3">
-                <div className="text-xs text-white/40 text-center font-medium uppercase tracking-wider">AI Agent Layer</div>
-                <ArchBox icon={Brain} label="Copilot Studio" sublabel="Agent Builder" color="blue" />
-                <Arrow />
-                <ArchBox icon={Cloud} label="Azure OpenAI" sublabel="GPT-4 Turbo" color="blue" />
-                <Arrow />
-                <ArchBox icon={Workflow} label="Power Automate" sublabel="Flow Orchestration" color="cyan" />
-              </div>
-
-              {/* Integration Layer */}
-              <div className="space-y-3">
-                <div className="text-xs text-white/40 text-center font-medium uppercase tracking-wider">Integration</div>
-                <ArchBox icon={Network} label="Azure API Mgmt" sublabel="Gateway & Security" color="yellow" />
-                <Arrow />
-                <ArchBox icon={Server} label="SAP ERP Connector" sublabel="Premium Connector" color="yellow" />
-                <Arrow />
-                <ArchBox icon={Lock} label="On-Prem Gateway" sublabel="Secure Tunnel" color="orange" />
-              </div>
-
-              {/* Translation Layer */}
-              <div className="space-y-3">
-                <div className="text-xs text-white/40 text-center font-medium uppercase tracking-wider">SAP Translation</div>
-                <ArchBox icon={Code} label="SAP NCo 3.1" sublabel=".NET Connector" color="orange" />
-                <Arrow />
-                <ArchBox icon={Settings} label="BAPI/RFC" sublabel="Function Calls" color="orange" />
-                <Arrow />
-                <ArchBox icon={FileText} label="OData Services" sublabel="REST APIs" color="orange" />
-              </div>
-
-              {/* SAP Layer */}
-              <div className="space-y-3">
-                <div className="text-xs text-white/40 text-center font-medium uppercase tracking-wider">SAP Systems</div>
-                <ArchBox icon={Database} label="SAP ECC/S4HANA" sublabel="ERP Core" color="green" />
-                <div className="mt-3 p-2 bg-white/5 rounded-lg">
-                  <div className="text-[10px] text-white/40 mb-1">SAP Tables</div>
-                  <div className="flex flex-wrap gap-1">
-                    {['LFA1', 'KNA1', 'MARA', 'EKKO', 'VBAK', 'LIKP'].map(t => (
-                      <span key={t} className="px-1.5 py-0.5 bg-green-500/20 text-green-400 rounded text-[9px] font-mono">{t}</span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Connection Legend */}
-            <div className="flex justify-center gap-8 mt-6 pt-4 border-t border-white/10">
-              <div className="flex items-center gap-2 text-xs text-white/50">
-                <div className="w-8 h-0.5 bg-gradient-to-r from-purple-500 to-blue-500 rounded" />
-                <span>User → Cloud (HTTPS)</span>
-              </div>
-              <div className="flex items-center gap-2 text-xs text-white/50">
-                <div className="w-8 h-0.5 bg-gradient-to-r from-yellow-500 to-orange-500 rounded" />
-                <span>Cloud → On-Prem (Secure Gateway)</span>
-              </div>
-              <div className="flex items-center gap-2 text-xs text-white/50">
-                <div className="w-8 h-0.5 bg-gradient-to-r from-orange-500 to-green-500 rounded" />
-                <span>Gateway → SAP (RFC/OData)</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Key Components */}
-          <div className="grid grid-cols-3 gap-4">
-            <div className="bg-blue-500/5 border border-blue-500/20 rounded-xl p-4">
-              <h4 className="text-sm font-semibold text-blue-400 mb-2 flex items-center gap-2">
-                <Brain className="w-4 h-4" /> Copilot Studio
-              </h4>
-              <p className="text-xs text-white/60 mb-2">Low-code agent builder with native SAP connectors. Handles intent recognition, entity extraction, and response generation.</p>
-              <div className="text-[10px] text-white/40">• Natural language understanding</div>
-              <div className="text-[10px] text-white/40">• Pre-built SAP actions</div>
-              <div className="text-[10px] text-white/40">• Microsoft Entra ID SSO</div>
-            </div>
-            <div className="bg-yellow-500/5 border border-yellow-500/20 rounded-xl p-4">
-              <h4 className="text-sm font-semibold text-yellow-400 mb-2 flex items-center gap-2">
-                <Server className="w-4 h-4" /> SAP ERP Connector
-              </h4>
-              <p className="text-xs text-white/60 mb-2">Premium Power Platform connector enabling direct RFC/BAPI calls through on-premises data gateway.</p>
-              <div className="text-[10px] text-white/40">• RFC & BAPI invocation</div>
-              <div className="text-[10px] text-white/40">• Dynamic schema discovery</div>
-              <div className="text-[10px] text-white/40">• SAP/Windows/Entra auth</div>
-            </div>
-            <div className="bg-orange-500/5 border border-orange-500/20 rounded-xl p-4">
-              <h4 className="text-sm font-semibold text-orange-400 mb-2 flex items-center gap-2">
-                <Lock className="w-4 h-4" /> On-Premises Gateway
-              </h4>
-              <p className="text-xs text-white/60 mb-2">Secure bridge between cloud services and on-premises SAP. Requires SAP NCo 3.1 connector installed.</p>
-              <div className="text-[10px] text-white/40">• Encrypted tunnel to Azure</div>
-              <div className="text-[10px] text-white/40">• High availability clustering</div>
-              <div className="text-[10px] text-white/40">• Kerberos delegation support</div>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Data Flow Section */}
       {activeSection === 'dataflow' && (
         <div className="space-y-6">
+          {/* Integration Approach */}
+          <div className="bg-gradient-to-r from-blue-500/10 to-teal-500/10 border border-blue-500/20 rounded-xl p-6 mb-0">
+            <h3 className="text-sm font-semibold text-white mb-3 flex items-center gap-2">
+              <Workflow className="w-4 h-4 text-blue-400" /> Dual Integration Strategy: OData Services + RFC
+            </h3>
+            <p className="text-xs text-white/60 mb-4">
+              Our solution leverages <span className="text-teal-400 font-semibold">OData services as the primary integration path</span> for SAP S/4HANA environments, providing modern RESTful APIs with standardized protocols.
+              For SAP ECC and complex transactional scenarios, <span className="text-orange-400 font-semibold">RFC/BAPI calls remain available as a fallback option</span> through the SAP .NET Connector.
+            </p>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-teal-500/10 border border-teal-500/20 rounded-lg p-3">
+                <div className="text-xs font-semibold text-teal-400 mb-2">OData Services (Primary)</div>
+                <div className="space-y-1 text-[10px] text-white/50">
+                  <div>• RESTful API over HTTPS — no gateway agent required for cloud SAP</div>
+                  <div>• Native S/4HANA support with pre-built API Business Hub services</div>
+                  <div>• Standard $filter, $expand, $orderby query options</div>
+                  <div>• JSON/XML payloads with built-in pagination</div>
+                  <div>• Azure API Management integration for throttling & caching</div>
+                </div>
+              </div>
+              <div className="bg-orange-500/10 border border-orange-500/20 rounded-lg p-3">
+                <div className="text-xs font-semibold text-orange-400 mb-2">RFC/BAPI (Fallback)</div>
+                <div className="space-y-1 text-[10px] text-white/50">
+                  <div>• Required for SAP ECC systems without OData exposure</div>
+                  <div>• Deep transactional operations (PO create, SO create)</div>
+                  <div>• SAP NCo 3.1 .NET Connector via on-premises gateway</div>
+                  <div>• Direct BAPI function module calls</div>
+                  <div>• Complex multi-step SAP transactions</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* End-to-End Flow */}
           <div className="bg-[#12121f] border border-white/10 rounded-xl p-6">
             <h3 className="text-sm font-semibold text-white mb-4">End-to-End Request Flow</h3>
@@ -1450,9 +1386,9 @@ function ArchitectureDiagram() {
               {[
                 { step: 1, title: 'User Query in Teams', desc: 'User types: "Show me all open POs from Acme Industrial"', tech: 'Microsoft Teams → Copilot Studio', time: '~50ms' },
                 { step: 2, title: 'Intent Classification', desc: 'Azure OpenAI GPT-4 identifies intent: LIST_PURCHASE_ORDERS with entity: vendor="Acme Industrial"', tech: 'Copilot Studio → Azure OpenAI', time: '~200ms' },
-                { step: 3, title: 'Action Mapping', desc: 'Copilot Studio maps to SAP ERP connector action: "Call BAPI_PO_GETITEMS"', tech: 'Agent Action → Power Automate', time: '~30ms' },
-                { step: 4, title: 'Gateway Routing', desc: 'Power Automate routes request through on-premises data gateway to SAP system', tech: 'Azure → On-Prem Gateway', time: '~100ms' },
-                { step: 5, title: 'SAP RFC Execution', desc: 'SAP NCo 3.1 translates to RFC call, executes BAPI_PO_GETITEMS with vendor filter', tech: 'Gateway → SAP via RFC', time: '~300ms' },
+                { step: 3, title: 'Action Mapping & Route Selection', desc: 'Copilot Studio determines optimal path — OData service for reads, RFC/BAPI for complex writes', tech: 'Agent Action → Power Automate', time: '~30ms' },
+                { step: 4, title: 'Gateway Routing', desc: 'OData: Direct HTTPS call to SAP Gateway / RFC: Routes through on-premises data gateway', tech: 'Azure → SAP Gateway (OData) or On-Prem Gateway (RFC)', time: '~100ms' },
+                { step: 5, title: 'SAP Execution (OData / RFC)', desc: 'OData: GET /sap/opu/odata/sap/API_PURCHASEORDER_PROCESS_SRV with $filter=Supplier eq "Acme" | RFC fallback: BAPI_PO_GETITEMS', tech: 'OData REST API → SAP  |  Gateway → SAP via RFC', time: '~300ms' },
                 { step: 6, title: 'Response Generation', desc: 'Results formatted as Adaptive Card showing PO list with details', tech: 'SAP → User via Teams', time: '~100ms' },
               ].map(({ step, title, desc, tech, time }) => (
                 <div key={step} className="flex gap-4 items-start">
@@ -1479,36 +1415,36 @@ function ArchitectureDiagram() {
           {/* Technical Requirements */}
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-white/5 border border-white/10 rounded-xl p-4">
-              <h4 className="text-sm font-semibold text-white mb-3">On-Premises Requirements</h4>
+              <h4 className="text-sm font-semibold text-white mb-3">OData / Cloud Requirements</h4>
               <div className="space-y-2 text-xs">
-                <div className="flex justify-between text-white/70"><span>On-Premises Data Gateway</span><span className="text-cyan-400">v3000.194+</span></div>
-                <div className="flex justify-between text-white/70"><span>SAP NCo .NET Connector</span><span className="text-cyan-400">v3.1.3.0 (64-bit)</span></div>
-                <div className="flex justify-between text-white/70"><span>Microsoft C++ Runtime</span><span className="text-cyan-400">v14.x</span></div>
-                <div className="flex justify-between text-white/70"><span>.NET Framework</span><span className="text-cyan-400">4.6.2 - 4.8.1</span></div>
-                <div className="flex justify-between text-white/70"><span>SAP Kernel</span><span className="text-cyan-400">RFC-enabled</span></div>
+                <div className="flex justify-between text-white/70"><span>SAP Gateway (OData)</span><span className="text-teal-400">Enabled</span></div>
+                <div className="flex justify-between text-white/70"><span>OData Service Activation</span><span className="text-teal-400">/IWFND/MAINT_SERVICE</span></div>
+                <div className="flex justify-between text-white/70"><span>Azure API Management</span><span className="text-teal-400">Standard tier+</span></div>
+                <div className="flex justify-between text-white/70"><span>OAuth 2.0 / SAP Principal Propagation</span><span className="text-yellow-400">Recommended</span></div>
+                <div className="flex justify-between text-white/70"><span>HTTPS Outbound (443)</span><span className="text-teal-400">Required</span></div>
               </div>
             </div>
             <div className="bg-white/5 border border-white/10 rounded-xl p-4">
-              <h4 className="text-sm font-semibold text-white mb-3">SAP Authorization Requirements</h4>
+              <h4 className="text-sm font-semibold text-white mb-3">RFC / On-Premises Requirements</h4>
               <div className="space-y-2 text-xs">
+                <div className="flex justify-between text-white/70"><span>On-Premises Data Gateway</span><span className="text-cyan-400">v3000.194+</span></div>
+                <div className="flex justify-between text-white/70"><span>SAP NCo .NET Connector</span><span className="text-cyan-400">v3.1.3.0 (64-bit)</span></div>
                 <div className="flex justify-between text-white/70"><span>RFC_METADATA access</span><span className="text-green-400">Required</span></div>
-                <div className="flex justify-between text-white/70"><span>S-User for NCo download</span><span className="text-green-400">Required</span></div>
                 <div className="flex justify-between text-white/70"><span>BAPI authorization</span><span className="text-green-400">Per function</span></div>
                 <div className="flex justify-between text-white/70"><span>Network port 3300</span><span className="text-green-400">Open to gateway</span></div>
-                <div className="flex justify-between text-white/70"><span>Principal propagation</span><span className="text-yellow-400">Recommended</span></div>
               </div>
             </div>
           </div>
 
-          {/* Connector Limitations */}
+          {/* Connector Notes */}
           <div className="bg-orange-500/5 border border-orange-500/20 rounded-xl p-4">
             <h4 className="text-sm font-semibold text-orange-400 mb-2 flex items-center gap-2">
-              <Settings className="w-4 h-4" /> SAP ERP Connector Limitations
+              <Settings className="w-4 h-4" /> Integration Considerations
             </h4>
             <div className="grid grid-cols-2 gap-4 text-xs text-white/60">
-              <div>• Supports only RFCs and BAPIs (no IDocs)</div>
-              <div>• 2MB payload limit for write operations</div>
-              <div>• 8MB compressed response limit for reads</div>
+              <div>• OData preferred for S/4HANA — RFC for ECC legacy</div>
+              <div>• 2MB payload limit for write operations (RFC)</div>
+              <div>• OData batch requests supported for bulk operations</div>
               <div>• Transactional RFCs (tRFCs) not supported</div>
               <div>• Cannot receive messages from SAP server</div>
               <div>• Gateway cluster requires load balancing OFF</div>
